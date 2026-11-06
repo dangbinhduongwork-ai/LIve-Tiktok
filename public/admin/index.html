@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Live Data Ingestion & Admin Center • Quản Trị Dữ Liệu Live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css?v=9">
+</head>
+<body>
+  <!-- MINIMAL SIMPLE VECTOR ICON SPRITE -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="icon-radio" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="2"></circle>
+      <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path>
+    </symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+      <circle cx="12" cy="12" r="3"></circle>
+    </symbol>
+    <symbol id="icon-users" viewBox="0 0 24 24">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+      <circle cx="9" cy="7" r="4"></circle>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+    </symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </symbol>
+    <symbol id="icon-coins" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M14.8 9A2 2 0 0 0 13 8h-2a2 2 0 0 0 0 4h2a2 2 0 0 1 0 4h-2a2 2 0 0 1-1.8-1"></path>
+      <path d="M12 6v2m0 8v2"></path>
+    </symbol>
+    <symbol id="icon-heart" viewBox="0 0 24 24">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+    </symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"></circle>
+      <polyline points="12 6 12 12 16 14"></polyline>
+    </symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24">
+      <polyline points="23 4 23 10 17 10"></polyline>
+      <polyline points="1 20 1 14 7 14"></polyline>
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+    </symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="7 10 12 15 17 10"></polyline>
+      <line x1="12" y1="15" x2="12" y2="3"></line>
+    </symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+      <line x1="12" y1="9" x2="12" y2="13"></line>
+      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </symbol>
+    <symbol id="icon-link" viewBox="0 0 24 24">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+    </symbol>
+    <symbol id="icon-power" viewBox="0 0 24 24">
+      <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+      <line x1="12" y1="2" x2="12" y2="12"></line>
+    </symbol>
+    <symbol id="icon-sliders" viewBox="0 0 24 24">
+      <line x1="4" y1="21" x2="4" y2="14"></line>
+      <line x1="4" y1="10" x2="4" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12" y2="3"></line>
+      <line x1="20" y1="21" x2="20" y2="16"></line>
+      <line x1="20" y1="12" x2="20" y2="3"></line>
+      <line x1="1" y1="14" x2="7" y2="14"></line>
+      <line x1="9" y1="8" x2="15" y2="8"></line>
+      <line x1="17" y1="16" x2="23" y2="16"></line>
+    </symbol>
+    <symbol id="icon-gift" viewBox="0 0 24 24">
+      <polyline points="20 12 20 22 4 22 4 12"></polyline>
+      <rect x="2" y="7" width="20" height="5"></rect>
+      <line x1="12" y1="22" x2="12" y2="7"></line>
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+    </symbol>
+    <symbol id="icon-message" viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </symbol>
+    <symbol id="icon-zap" viewBox="0 0 24 24">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+    </symbol>
+    <symbol id="icon-chart" viewBox="0 0 24 24">
+      <line x1="18" y1="20" x2="18" y2="10"></line>
+      <line x1="12" y1="20" x2="12" y2="4"></line>
+      <line x1="6" y1="20" x2="6" y2="14"></line>
+    </symbol>
+    <symbol id="icon-columns" viewBox="0 0 24 24">
+      <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"></path>
+    </symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24">
+      <polyline points="3 6 5 6 21 6"></polyline>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    </symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24">
+      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+      <polyline points="2 17 12 22 22 17"></polyline>
+      <polyline points="2 12 12 17 22 12"></polyline>
+    </symbol>
+    <symbol id="icon-trending" viewBox="0 0 24 24">
+      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+      <polyline points="17 6 23 6 23 12"></polyline>
+    </symbol>
+    <symbol id="icon-crown" viewBox="0 0 24 24">
+      <polygon points="2 4 5 16 19 16 22 4 15 9 12 3 9 9 2 4"></polygon>
+      <line x1="5" y1="20" x2="19" y2="20"></line>
+    </symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+    </symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </symbol>
+  </svg>
+
+  <div class="admin-container">
+    
+    <!-- TOP NAVBAR -->
+    <header class="admin-header">
+      <div class="header-brand">
+        <span class="brand-icon">
+          <svg class="svg-icon lg"><use href="#icon-radio"/></svg>
+        </span>
+        <div>
+          <h1>TIKTOK LIVE DATA CONTROLLER</h1>
+          <p class="subtitle">Trung Tâm Tiếp Nhận Dữ Liệu Thời Gian Thực & Quản Trị Streamer</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btnHeaderRefresh" class="btn btn-secondary">
+          <svg class="svg-icon"><use href="#icon-refresh"/></svg>
+          <span>Làm Mới Dữ Liệu</span>
+        </button>
+        <a href="/api/gifts/export.csv" target="_blank" class="btn btn-accent" download>
+          <svg class="svg-icon"><use href="#icon-download"/></svg>
+          <span>Xuất Excel / CSV</span>
+        </a>
+        <button id="btnResetSession" class="btn btn-danger">
+          <svg class="svg-icon"><use href="#icon-alert"/></svg>
+          <span>Reset Phiên Live</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- METRICS OVERVIEW BAR (6 CARDS INCLUDING LIVE VIEWER COUNT) -->
+    <div class="metrics-bar">
+      <div class="metric-card">
+        <div class="metric-icon">
+          <svg class="svg-icon lg"><use href="#icon-radio"/></svg>
+        </div>
+        <div class="metric-info">
+          <div class="metric-label">TRẠNG THÁI LIVE</div>
+          <div class="metric-value" id="statTiktokStatus">Chưa kết nối</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="color: #34d399;">
+          <svg class="svg-icon lg"><use href="#icon-eye"/></svg>
+        </div>
+        <div class="metric-info">
+          <div class="metric-label">NGƯỜI XEM LIVE</div>
+          <div class="metric-value" id="statViewerCount">0 mắt xem</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="color: #60a5fa;">
+          <svg class="svg-icon lg"><use href="#icon-users"/></svg>
+        </div>
+        <div class="metric-info">
+          <div class="metric-label">KHÁN GIẢ TƯƠNG TÁC</div>
+          <div class="metric-value" id="statPlayerCount">0 người</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="color: #fbbf24;">
+          <svg class="svg-icon lg"><use href="#icon-coins"/></svg>
+        </div>
+        <div class="metric-info">
+          <div class="metric-label">TỔNG XU DONATE</div>
+          <div class="metric-value" id="statTotalCoins">0 Xu</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="color: #fb7185;">
+          <svg class="svg-icon lg"><use href="#icon-heart"/></svg>
+        </div>
+        <div class="metric-info">
+          <div class="metric-label">LƯỢT THẢ TIM</div>
+          <div class="metric-value" id="statTotalLikes">0 Tim</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon" style="color: #a78bfa;">
+          <svg class="svg-icon lg"><use href="#icon-clock"/></svg>
+        </div>
+        <div class="metric-info">
+          <div class="metric-label">THỜI GIAN CHẠY</div>
+          <div class="metric-value" id="statUptime">00:00:00</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPPER WORKSPACE: 2-COLUMN BALANCED GRID -->
+    <section class="admin-grid-top">
+
+      <!-- ========================================================
+           COLUMN 1: TIKTOK LIVE CONNECTION & EVENT TERMINAL
+      ======================================================== -->
+      <section class="card">
+        <div class="card-header">
+          <h2>
+            <svg class="svg-icon" style="color: #38bdf8;"><use href="#icon-radio"/></svg>
+            <span>Kết Nối TikTok Live & Terminal</span>
+          </h2>
+          <span id="tiktokStatusBadge" class="status-badge disconnected">Chưa kết nối</span>
+        </div>
+        <div class="card-body">
+          <div class="input-group">
+            <label for="tiktokUsernameInput">Username TikTok của phòng Live đang phát:</label>
+            <div class="input-with-button">
+              <div class="input-row" style="flex: 1;">
+                <span class="input-prefix">@</span>
+                <input type="text" id="tiktokUsernameInput" placeholder="nhập username (VD: streamervietnam)" />
+              </div>
+              <button id="btnConnectTikTok" class="btn btn-success">
+                <svg class="svg-icon"><use href="#icon-link"/></svg>
+                <span>Kết Nối</span>
+              </button>
+              <button id="btnDisconnectTikTok" class="btn btn-outline-danger" disabled>
+                <svg class="svg-icon"><use href="#icon-power"/></svg>
+                <span>Ngắt</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Real-Time Event Log Terminal -->
+          <div class="event-log-container" style="margin-top: 12px;">
+            <div class="event-log-header">
+              <div class="log-filter-tabs">
+                <button class="filter-tab active" data-filter="all">Tất Cả</button>
+                <button class="filter-tab" data-filter="gift">
+                  <svg class="svg-icon sm"><use href="#icon-gift"/></svg> Quà
+                </button>
+                <button class="filter-tab" data-filter="chat">
+                  <svg class="svg-icon sm"><use href="#icon-message"/></svg> Chat
+                </button>
+                <button class="filter-tab" data-filter="like">
+                  <svg class="svg-icon sm"><use href="#icon-heart"/></svg> Tim
+                </button>
+              </div>
+              <button id="btnClearLog" class="btn-text">Xóa log</button>
+            </div>
+            <div id="eventLogList" class="event-log-list" style="height: 380px;">
+              <div class="log-item info">[READY] Hệ thống sẵn sàng đón nhận dữ liệu tương tác từ TikTok Live...</div>
+            </div>
+          </div>
+
+          <!-- Mini API Quick Bar -->
+          <div class="api-bar-mini">
+            <span class="api-bar-label">
+              <svg class="svg-icon sm"><use href="#icon-zap"/></svg> Cổng API:
+            </span>
+            <a href="/api/status" target="_blank" class="api-badge-link" title="Xem JSON trạng thái">/api/status</a>
+            <a href="/api/players" target="_blank" class="api-badge-link" title="Xem JSON danh sách khán giả">/api/players</a>
+            <a href="/api/players/export.csv" target="_blank" class="api-badge-link" style="color: #60a5fa; border-color: rgba(96,165,250,0.3);" title="Tải Excel CSV thống kê khán giả">/api/players/export.csv</a>
+            <a href="/api/gifts" target="_blank" class="api-badge-link" title="Xem JSON bảng kê quà">/api/gifts</a>
+            <a href="/api/gifts/export.csv" target="_blank" class="api-badge-link" style="color: #fbbf24; border-color: rgba(251,191,36,0.3);" title="Tải file Excel CSV quà tặng">/api/gifts/export.csv</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           COLUMN 2: AUTHENTIC TIKTOK LIVE DATA SIMULATOR
+      ======================================================== -->
+      <section class="card">
+        <div class="card-header">
+          <h2>
+            <svg class="svg-icon" style="color: #f59e0b;"><use href="#icon-sliders"/></svg>
+            <span>Bộ Giả Lập Quà TikTok Live Chuẩn</span>
+          </h2>
+          <div class="traffic-toggle-wrap">
+            <button id="btnQuickTestNguyễnVănA" class="btn btn-sm btn-accent" title="Test ca cốt lõi chống cộng trùng quà">
+              <svg class="svg-icon sm"><use href="#icon-zap"/></svg>
+              <span>5 Hoa = 5 Xu</span>
+            </button>
+            <button id="btnToggleTraffic" class="btn btn-sm btn-outline">Bật Test Tải</button>
+          </div>
+        </div>
+        <div class="card-body">
+          
+          <!-- Thông tin người xem giả lập -->
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr auto; align-items: end;">
+            <div class="input-group">
+              <label for="simNickname">Tên người xem:</label>
+              <input type="text" id="simNickname" value="Nguyễn Văn A" />
+            </div>
+            <div class="input-group">
+              <label for="simUserId">User ID TikTok:</label>
+              <input type="text" id="simUserId" value="nguyenvana_01" />
+            </div>
+            <div class="input-group">
+              <button id="btnSimLeave" class="btn btn-outline-danger" style="height: 36px; white-space: nowrap;" title="Giả lập khán giả này rời phòng live: Trừ 1 Khán giả tương tác nhưng giữ nguyên 100% Xu & Tim đã donate">
+                <svg class="svg-icon sm"><use href="#icon-power"/></svg>
+                <span>Out Phòng</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 1. KHO QUÀ TẶNG CHUẨN TIKTOK LIVE -->
+          <div class="simulator-subcard" style="margin-top: 10px;">
+            <div class="subcard-title" style="display: flex; justify-content: space-between; align-items: center;">
+              <span><svg class="svg-icon sm"><use href="#icon-gift"/></svg> KHO QUÀ TẶNG CHUẨN TIKTOK LIVE:</span>
+              <span style="font-size: 11px; color: #94a3b8;">Click món quà để chọn</span>
+            </div>
+            
+            <!-- Category Tabs -->
+            <div class="gift-cat-tabs">
+              <button class="gift-cat-tab active" data-cat="all">Tất Cả (19)</button>
+              <button class="gift-cat-tab" data-cat="common">1 - 30 Xu (Phổ Thông)</button>
+              <button class="gift-cat-tab" data-cat="mid">99 - 1000 Xu (Trung Cấp)</button>
+              <button class="gift-cat-tab" data-cat="high">1088 - 5000 Xu (Cao Cấp)</button>
+              <button class="gift-cat-tab" data-cat="vip">Siêu VIP (10000+ Xu)</button>
+            </div>
+
+            <!-- Authentic TikTok Gifts Grid (Simple Monochrome Vector Icons) -->
+            <div class="tiktok-gift-grid" id="tiktokGiftGrid">
+              <!-- Tier 1: 1 - 30 Xu -->
+              <button class="gift-card-btn active" data-cat="common" data-gift="Hoa Hồng" data-diamonds="1" data-id="5655">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-heart"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Hoa Hồng</span>
+                  <span class="gift-card-price">1 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="common" data-gift="Kem Ốc Quế" data-diamonds="1" data-id="5827">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-gift"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Kem Ốc Quế</span>
+                  <span class="gift-card-price">1 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="common" data-gift="Ngón Tay Tim" data-diamonds="5" data-id="5487">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-heart"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Ngón Tay Tim</span>
+                  <span class="gift-card-price">5 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="common" data-gift="Gấu Trúc" data-diamonds="5" data-id="5269">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-gift"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Gấu Trúc</span>
+                  <span class="gift-card-price">5 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="common" data-gift="Nước Hoa" data-diamonds="20" data-id="5585">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-star"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Nước Hoa</span>
+                  <span class="gift-card-price">20 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="common" data-gift="Bánh Donut" data-diamonds="30" data-id="5650">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-gift"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Bánh Donut</span>
+                  <span class="gift-card-price">30 Xu</span>
+                </div>
+              </button>
+
+              <!-- Tier 2: 99 - 1000 Xu -->
+              <button class="gift-card-btn" data-cat="mid" data-gift="Mũ & Kính Mát" data-diamonds="99" data-id="5656">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-star"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Mũ & Kính Mát</span>
+                  <span class="gift-card-price">99 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="mid" data-gift="Vương Miện Mini" data-diamonds="199" data-id="5879">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-crown"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Vương Miện Mini</span>
+                  <span class="gift-card-price">199 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="mid" data-gift="Thiên Nga" data-diamonds="699" data-id="5337">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-star"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Thiên Nga</span>
+                  <span class="gift-card-price">699 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="mid" data-gift="Xe Thể Thao" data-diamonds="1000" data-id="6017">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-zap"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Xe Thể Thao</span>
+                  <span class="gift-card-price">1000 Xu</span>
+                </div>
+              </button>
+
+              <!-- Tier 3: 1088 - 5000 Xu -->
+              <button class="gift-card-btn" data-cat="high" data-gift="Pháo Hoa" data-diamonds="1088" data-id="5658">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-star"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Pháo Hoa</span>
+                  <span class="gift-card-price">1088 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="high" data-gift="Tên Lửa" data-diamonds="1160" data-id="5930">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-zap"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Tên Lửa</span>
+                  <span class="gift-card-price">1160 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="high" data-gift="Cá Voi Bay" data-diamonds="2150" data-id="5880">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-star"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Cá Voi Bay</span>
+                  <span class="gift-card-price">2150 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="high" data-gift="Kỳ Lân Bay" data-diamonds="5000" data-id="5998">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-crown"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Kỳ Lân Bay</span>
+                  <span class="gift-card-price">5000 Xu</span>
+                </div>
+              </button>
+
+              <!-- Tier 4: Super VIP (10000+ Xu) -->
+              <button class="gift-card-btn" data-cat="vip" data-gift="Chim Ưng Lửa" data-diamonds="10999" data-id="6185">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-crown"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Chim Ưng Lửa</span>
+                  <span class="gift-card-price">10999 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="vip" data-gift="Lâu Đài Giấc Mơ" data-diamonds="20000" data-id="5979">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-crown"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Lâu Đài Mơ</span>
+                  <span class="gift-card-price">20000 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="vip" data-gift="Rồng Thần" data-diamonds="26999" data-id="6061">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-crown"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Rồng Thần</span>
+                  <span class="gift-card-price">26999 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="vip" data-gift="Sư Tử TikTok" data-diamonds="29999" data-id="6059">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-crown"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Sư Tử TikTok</span>
+                  <span class="gift-card-price">29999 Xu</span>
+                </div>
+              </button>
+              <button class="gift-card-btn" data-cat="vip" data-gift="Vũ Trụ TikTok (Universe)" data-diamonds="34999" data-id="6064">
+                <span class="gift-card-icon"><svg class="svg-icon"><use href="#icon-crown"/></svg></span>
+                <div class="gift-card-info">
+                  <span class="gift-card-name">Vũ Trụ Universe</span>
+                  <span class="gift-card-price">34999 Xu</span>
+                </div>
+              </button>
+            </div>
+
+            <!-- Custom Gift / Selected Gift Details & Streak -->
+            <div style="background: rgba(0,0,0,0.25); border-radius: 8px; padding: 10px; margin-top: 6px;">
+              <div class="form-grid">
+                <div class="input-group">
+                  <label for="customGiftName">Món Quà Đang Chọn:</label>
+                  <input type="text" id="customGiftName" value="Hoa Hồng" />
+                </div>
+                <div class="input-group">
+                  <label for="customGiftDiamonds">Đơn Giá (Xu):</label>
+                  <input type="number" id="customGiftDiamonds" value="1" min="1" />
+                </div>
+              </div>
+
+              <div class="streak-select-row" style="margin-top: 8px;">
+                <label style="font-size: 12px; font-weight: 700; color: #94a3b8;">Streak Combo:</label>
+                <div class="streak-radios">
+                  <label><input type="radio" name="simStreak" value="1" checked> x1</label>
+                  <label><input type="radio" name="simStreak" value="5"> x5</label>
+                  <label><input type="radio" name="simStreak" value="10"> x10</label>
+                  <label><input type="radio" name="simStreak" value="99"> x99</label>
+                </div>
+                <button id="btnSendCustomGift" class="btn btn-sm btn-accent" style="margin-left: auto;">
+                  <svg class="svg-icon sm"><use href="#icon-gift"/></svg>
+                  <span>Gửi Quà Này</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. BÌNH LUẬN (CHAT) & THẢ TIM (LIKE) -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+            <!-- Chat Simulator -->
+            <div class="simulator-subcard">
+              <div class="subcard-title">
+                <svg class="svg-icon sm"><use href="#icon-message"/></svg> BÌNH LUẬN (CHAT):
+              </div>
+              <div class="input-with-button">
+                <input type="text" id="simComment" placeholder="Nhập bình luận..." value="Chào streamer và cả phòng live nha!" />
+                <button id="btnSimChat" class="btn btn-secondary">Gửi</button>
+              </div>
+              <div class="chat-chips-row" style="margin-top: 6px;">
+                <button class="chip-btn" data-text="Chào streamer và cả phòng live nha!">Chào Live</button>
+                <button class="chip-btn" data-text="Thả tim mỏi tay luôn nè shop ơi!">Thả Tim</button>
+                <button class="chip-btn" data-text="Phòng live hôm nay đông vui quá!">Đông Vui</button>
+              </div>
+            </div>
+
+            <!-- Like Simulator -->
+            <div class="simulator-subcard">
+              <div class="subcard-title">
+                <svg class="svg-icon sm"><use href="#icon-heart"/></svg> THẢ TIM (LIKE):
+              </div>
+              <div class="like-buttons-grid" style="grid-template-columns: repeat(5, 1fr);">
+                <button class="btn btn-heart btn-like-count" data-count="1">+1</button>
+                <button class="btn btn-heart btn-like-count" data-count="5">+5</button>
+                <button class="btn btn-heart btn-like-count" data-count="20">+20</button>
+                <button class="btn btn-heart btn-like-count" data-count="50">+50</button>
+                <button class="btn btn-heart btn-like-count" data-count="100">+100</button>
+              </div>
+              <div style="font-size: 11px; color: #94a3b8; margin-top: 10px; text-align: center;">
+                Bấm vào các nút trên để mô phỏng lượt thả tim dồn dập
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </section>
+
+    <!-- ========================================================
+         MAIN DATA SECTION: NAVIGATION TABS
+    ======================================================== -->
+    <div class="main-data-tabs">
+      <button class="data-tab-btn active" data-view="all">
+        <svg class="svg-icon"><use href="#icon-layers"/></svg>
+        <span>HIỂN THỊ TẤT CẢ BẢNG THỐNG KÊ</span>
+      </button>
+      <button class="data-tab-btn" data-view="viewers">
+        <svg class="svg-icon"><use href="#icon-users"/></svg>
+        <span>BẢNG THỐNG KÊ TOÀN BỘ KHÁN GIẢ (XẾP HẠNG XU DONATE)</span>
+        <span class="data-tab-badge" id="tabViewerBadge">0 người</span>
+      </button>
+      <button class="data-tab-btn" data-view="gifts">
+        <svg class="svg-icon"><use href="#icon-chart"/></svg>
+        <span>BẢNG KÊ CHI TIẾT MÓN QUÀ (GIFT ANALYTICS)</span>
+        <span class="data-tab-badge" id="tabGiftBadge">0 loại • 0 Xu</span>
+      </button>
+      <button class="data-tab-btn" data-view="split">
+        <svg class="svg-icon"><use href="#icon-columns"/></svg>
+        <span>CHIA ĐÔI 2 CỘT SONG SONG</span>
+      </button>
+    </div>
+
+    <!-- MAIN DATA PANELS CONTAINER -->
+    <div id="dataPanelsContainer">
+
+      <!-- ========================================================
+           PANEL 1: ALL-TIME VIEWER STATISTICS & DONATION LEADERBOARD
+      ======================================================== -->
+      <section id="panelViewers" class="card full-width viewer-analytics-card data-panel-content" style="margin-bottom: 20px;">
+        <div class="card-header">
+          <div class="header-title-group">
+            <h2>
+              <svg class="svg-icon" style="color: #60a5fa;"><use href="#icon-users"/></svg>
+              <span>Bảng Thống Kê Toàn Bộ Khán Giả Đã Tương Tác (Sắp Xếp Theo Xu Donate)</span>
+            </h2>
+            <span id="playerCountBadge" class="status-badge connected" style="font-size: 11px; margin-left: 8px;">0 trong phòng / 0 tổng</span>
+          </div>
+          
+          <div class="header-actions-inline">
+            <a href="/api/players/export.csv" target="_blank" id="btnExportPlayerCsv" class="btn btn-sm btn-accent" download>
+              <svg class="svg-icon sm"><use href="#icon-download"/></svg>
+              <span>Xuất Excel / CSV Khán Giả</span>
+            </a>
+            <button id="btnRefreshPlayers" class="btn btn-sm btn-secondary">
+              <svg class="svg-icon sm"><use href="#icon-refresh"/></svg> Làm mới
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- 5 Summary Metrics for All-Time Interactive Viewers -->
+          <div class="gift-metrics-row">
+            <div class="gift-metric-pill">
+              <span class="pill-icon" style="color: #60a5fa;">
+                <svg class="svg-icon lg"><use href="#icon-users"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">TỔNG KHÁN GIẢ TỪ LÚC LIVE</div>
+                <div class="pill-val" id="valViewerTotal" style="color: #60a5fa;">0 người</div>
+              </div>
+            </div>
+            <div class="gift-metric-pill">
+              <span class="pill-icon" style="color: #34d399;">
+                <svg class="svg-icon lg"><use href="#icon-eye"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">TRONG PHÒNG / ĐÃ OUT</div>
+                <div class="pill-val" id="valViewerOnlineSplit" style="color: #34d399; font-size: 13px;">0 đang xem • 0 đã out</div>
+              </div>
+            </div>
+            <div class="gift-metric-pill">
+              <span class="pill-icon" style="color: #fbbf24;">
+                <svg class="svg-icon lg"><use href="#icon-coins"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">KHÁN GIẢ ĐÃ DONATE XU</div>
+                <div class="pill-val" id="valViewerDonors" style="color: #fbbf24;">0 người</div>
+              </div>
+            </div>
+            <div class="gift-metric-pill">
+              <span class="pill-icon" style="color: #f59e0b;">
+                <svg class="svg-icon lg"><use href="#icon-crown"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">TOP 1 ĐẠI GIA DONATE</div>
+                <div class="pill-val text-truncate" id="valViewerTop1" style="color: #fde047;">Chưa có</div>
+              </div>
+            </div>
+            <div class="gift-metric-pill">
+              <span class="pill-icon" style="color: #fb7185;">
+                <svg class="svg-icon lg"><use href="#icon-heart"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">TỔNG CHAT & THẢ TIM</div>
+                <div class="pill-val" id="valViewerEngagement" style="color: #fb7185; font-size: 13px;">0 Chat • 0 Tim</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter & Sort Toolbar -->
+          <div class="viewer-toolbar">
+            <div class="viewer-filter-tabs">
+              <button class="viewer-filter-tab active" data-vfilter="all">
+                Tất Cả Từ Lúc Live (<span id="countFilterAll">0</span>)
+              </button>
+              <button class="viewer-filter-tab" data-vfilter="donors">
+                <svg class="svg-icon sm" style="color: #fbbf24;"><use href="#icon-coins"/></svg>
+                Có Donate Xu (<span id="countFilterDonors">0</span>)
+              </button>
+              <button class="viewer-filter-tab" data-vfilter="online">
+                <span style="color: #34d399;">●</span> Đang Trong Phòng (<span id="countFilterOnline">0</span>)
+              </button>
+              <button class="viewer-filter-tab" data-vfilter="offline">
+                <span style="color: #94a3b8;">○</span> Đã Out Phòng (<span id="countFilterOffline">0</span>)
+              </button>
+            </div>
+
+            <div class="viewer-search-sort">
+              <select id="playerSortSelect" class="sort-select" title="Tiêu chí sắp xếp bảng thống kê khán giả">
+                <option value="coins" selected>Sắp xếp: Số Xu Donate (Cao → Thấp)</option>
+                <option value="likes">Sắp xếp: Lượt Thả Tim (Cao → Thấp)</option>
+                <option value="chats">Sắp xếp: Lượt Bình Luận (Cao → Thấp)</option>
+                <option value="recent">Sắp xếp: Hoạt Động Gần Nhất</option>
+              </select>
+              <div class="search-box">
+                <input type="text" id="playerSearchInput" placeholder="Tìm theo tên hoặc User ID..." />
+              </div>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="player-table">
+              <thead>
+                <tr>
+                  <th style="width: 68px;">Hạng</th>
+                  <th>Khán Giả</th>
+                  <th>Trạng Thái Phòng</th>
+                  <th>Số Xu Donate ↓</th>
+                  <th style="width: 165px;">Tỷ Trọng Donate</th>
+                  <th>Lượt Thả Tim</th>
+                  <th>Lượt Bình Luận</th>
+                  <th>Bình Luận Gần Nhất</th>
+                  <th>Tham Gia / Hoạt Động Cuối</th>
+                  <th>Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="playerTableBody">
+                <tr>
+                  <td colspan="10" class="text-center">Đang nạp bảng thống kê khán giả...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           PANEL 2: GIFT ANALYTICS & LIVE TRANSACTIONS
+      ======================================================== -->
+      <section id="panelGiftAnalytics" class="card full-width gift-analytics-card data-panel-content">
+        <div class="card-header">
+          <div class="header-title-group">
+            <h2>
+              <svg class="svg-icon" style="color: #fbbf24;"><use href="#icon-gift"/></svg>
+              <span>Bảng Kê Chi Tiết Món Quà (Gift Analytics & Log)</span>
+            </h2>
+            <span id="giftTotalBadge" class="status-badge connected" style="font-size: 11px; margin-left: 8px;">0 loại quà • 0 Xu</span>
+          </div>
+          <div class="header-actions-inline">
+            <a href="/api/gifts/export.csv" target="_blank" id="btnExportGiftCsv" class="btn btn-sm btn-accent" download>
+              <svg class="svg-icon sm"><use href="#icon-download"/></svg>
+              <span>Xuất File Excel / CSV</span>
+            </a>
+            <button id="btnClearGifts" class="btn btn-sm btn-outline-danger">
+              <svg class="svg-icon sm"><use href="#icon-trash"/></svg>
+              <span>Reset Quà</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- 5 Mini Metrics for Gifts -->
+          <div class="gift-metrics-row">
+            <div class="gift-metric-pill">
+              <span class="pill-icon">
+                <svg class="svg-icon lg"><use href="#icon-gift"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">LOẠI QUÀ NHẬN</div>
+                <div class="pill-val" id="valGiftTypes">0 loại</div>
+              </div>
+            </div>
+            <div class="gift-metric-pill">
+              <span class="pill-icon">
+                <svg class="svg-icon lg"><use href="#icon-layers"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">TỔNG SỐ LƯỢNG</div>
+                <div class="pill-val" id="valGiftUnits">0 món</div>
+              </div>
+            </div>
+            <div class="gift-metric-pill">
+              <span class="pill-icon">
+                <svg class="svg-icon lg"><use href="#icon-coins"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">DOANH THU QUÀ</div>
+                <div class="pill-val" id="valGiftCoins">0 Xu</div>
+              </div>
+            </div>
+            <div class="gift-metric-pill">
+              <span class="pill-icon">
+                <svg class="svg-icon lg"><use href="#icon-trending"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">QUÀ NHẬN NHIỀU NHẤT</div>
+                <div class="pill-val text-truncate" id="valGiftPopular">Chưa có</div>
+              </div>
+            </div>
+            <div class="gift-metric-pill">
+              <span class="pill-icon">
+                <svg class="svg-icon lg"><use href="#icon-crown"/></svg>
+              </span>
+              <div>
+                <div class="pill-label">QUÀ GIÁ TRỊ NHẤT</div>
+                <div class="pill-val text-truncate" id="valGiftTopRevenue">Chưa có</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs: Bảng Kê Theo Món vs Nhật Ký Giao Dịch Live -->
+          <div class="gift-subtabs">
+            <button class="gift-subtab active" data-subtab="summary">
+              <svg class="svg-icon sm"><use href="#icon-chart"/></svg> Thống Kê Theo Từng Loại Quà
+            </button>
+            <button class="gift-subtab" data-subtab="stream">
+              <svg class="svg-icon sm"><use href="#icon-zap"/></svg> Nhật Ký Tặng Quà Thời Gian Thực
+            </button>
+          </div>
+
+          <!-- TAB 1: SUMMARY TABLE -->
+          <div id="tabGiftSummary" class="gift-tab-content active">
+            <div class="table-responsive">
+              <table class="player-table gift-table">
+                <thead>
+                  <tr>
+                    <th style="width: 50px;">Icon</th>
+                    <th>Tên Món Quà</th>
+                    <th>Đơn Giá (Xu)</th>
+                    <th>Số Lượng Nhận</th>
+                    <th>Tổng Xu Thu Về</th>
+                    <th style="width: 180px;">Tỷ Trọng Doanh Thu</th>
+                    <th>Khán Giả Tặng Nhiều Nhất</th>
+                  </tr>
+                </thead>
+                <tbody id="giftTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center">Chưa có dữ liệu quà tặng trong phiên này. Hãy tặng quà hoặc dùng bộ giả lập để xem số liệu!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 2: LIVE STREAM LOG -->
+          <div id="tabGiftStream" class="gift-tab-content" style="display: none;">
+            <div class="table-responsive">
+              <table class="player-table gift-tx-table">
+                <thead>
+                  <tr>
+                    <th style="width: 100px;">Thời Gian</th>
+                    <th>Khán Giả</th>
+                    <th>Món Quà</th>
+                    <th>Số Lượng</th>
+                    <th>Giá Trị</th>
+                  </tr>
+                </thead>
+                <tbody id="giftTxTableBody">
+                  <tr>
+                    <td colspan="5" class="text-center">Chưa có giao dịch quà tặng nào.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="admin.js?v=11"></script>
+</body>
+</html>
