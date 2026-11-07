@@ -29,9 +29,23 @@ class TikTokHandler {
   }
 
   /**
-   * Connect to a TikTok channel by username
+   * Clear all active combo streak timers and memory
    */
-  async connect(username) {
+  clearActiveStreaks() {
+    for (const streak of this.activeStreaks.values()) {
+      if (streak && streak.timer) {
+        clearTimeout(streak.timer);
+      }
+    }
+    this.activeStreaks.clear();
+  }
+
+  /**
+   * Connect to a TikTok channel by username.
+   * When connecting to a new username, automatically resets all old session data
+   * (viewers, coins, gifts, combo streaks) so the new room starts completely fresh.
+   */
+  async connect(username, options = {}) {
     if (!username || typeof username !== 'string') {
       throw new Error('Vui lòng cung cấp TikTok username hợp lệ');
     }
@@ -41,9 +55,27 @@ class TikTokHandler {
       throw new Error('Username TikTok không được để trống');
     }
 
+    const previousUsername = this.currentUsername;
+    const isNewChannel = !previousUsername || previousUsername.toLowerCase() !== cleanUsername.toLowerCase();
+    const shouldReset = !options.isAutoReconnect && (options.resetSession ?? isNewChannel);
+
     // Disconnect previous connection if active
     if (this.connection) {
       this.disconnect();
+    }
+
+    // If connecting to a new channel/username, reset old viewer & gift data immediately
+    if (shouldReset) {
+      console.log(`[TikTok] Kết nối kênh mới @${cleanUsername} (kênh trước: ${previousUsername || 'chưa có'}). Đang làm mới dữ liệu khán giả cũ...`);
+      this.clearActiveStreaks();
+      stateManager.resetSession();
+      this.viewerCount = 0;
+      this.emitEvent('session_reset', {
+        username: cleanUsername,
+        previousUsername,
+        reason: 'channel_switch',
+        timestamp: Date.now()
+      });
     }
 
     this.currentUsername = cleanUsername;
@@ -112,6 +144,7 @@ class TikTokHandler {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+    this.clearActiveStreaks();
     if (this.connection) {
       try {
         this.connection.disconnect();
@@ -154,7 +187,7 @@ class TikTokHandler {
     this.reconnectTimer = setTimeout(async () => {
       this.reconnectTimer = null;
       try {
-        await this.connect(this.currentUsername);
+        await this.connect(this.currentUsername, { isAutoReconnect: true, resetSession: false });
       } catch {
         // Will auto reschedule inside connect error handler
       }

@@ -23,6 +23,8 @@ const tiktokUsernameInput = document.getElementById('tiktokUsernameInput');
 const btnConnectTikTok = document.getElementById('btnConnectTikTok');
 const btnDisconnectTikTok = document.getElementById('btnDisconnectTikTok');
 const tiktokStatusBadge = document.getElementById('tiktokStatusBadge');
+const chkAutoResetNewUser = document.getElementById('chkAutoResetNewUser');
+const btnQuickClearData = document.getElementById('btnQuickClearData');
 
 // Event Log & Filters
 const eventLogList = document.getElementById('eventLogList');
@@ -202,7 +204,7 @@ socket.on('admin:gift_breakdown_updated', (data) => {
   }
 });
 
-socket.on('live:session_reset', () => {
+socket.on('live:session_reset', (data) => {
   cachedPlayers = [];
   cachedGiftBreakdown = [];
   cachedGiftTransactions = [];
@@ -210,7 +212,9 @@ socket.on('live:session_reset', () => {
   renderGiftBreakdown([], null);
   renderGiftTransactions([]);
   updateMetrics([]);
-  addLog('status', '[RESET] Đã làm mới toàn bộ dữ liệu phiên live.');
+  updateViewerCountDisplay(0);
+  const channelMsg = data?.username ? ` cho phòng live @${data.username}` : '';
+  addLog('status', `[RESET] Đã làm mới toàn bộ dữ liệu phiên live${channelMsg}.`);
 });
 
 // =========================================================================
@@ -223,9 +227,10 @@ btnConnectTikTok.addEventListener('click', () => {
     alert('Vui lòng nhập TikTok username!');
     return;
   }
+  const resetSession = chkAutoResetNewUser ? chkAutoResetNewUser.checked : true;
   btnConnectTikTok.disabled = true;
   updateTikTokBadge('connecting', 'Đang kết nối...');
-  socket.emit('admin:tiktok_connect', { username });
+  socket.emit('admin:tiktok_connect', { username, resetSession });
   addLog('status', `[CONNECTING] Đang thiết lập kết nối tới kênh @${username}...`);
 });
 
@@ -236,6 +241,14 @@ btnDisconnectTikTok.addEventListener('click', () => {
   updateViewerCountDisplay(0);
   addLog('status', '[STOPPED] Đã ngắt kết nối phiên Live.');
 });
+
+if (btnQuickClearData) {
+  btnQuickClearData.addEventListener('click', () => {
+    if (confirm('BẠN CÓ CHẮC CHẮN MUỐN XÓA DỮ LIỆU CŨ?\nToàn bộ danh sách người xem, xu donate và quà sẽ được làm mới ngay!')) {
+      socket.emit('admin:reset_session');
+    }
+  });
+}
 
 function handleTikTokStatusUpdate(data) {
   if (typeof data.viewerCount === 'number') {

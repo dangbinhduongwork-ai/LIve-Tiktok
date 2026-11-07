@@ -148,7 +148,7 @@ async function runTests() {
   console.log('[Setup] Test client connected via Socket.IO');
 
   let passedTests = 0;
-  let totalTests = 8;
+  let totalTests = 9;
 
   try {
     // -------------------------------------------------------------------------
@@ -411,6 +411,35 @@ async function runTests() {
     }
 
     console.log(`✅ [Test 8 ĐẠT] Out phòng giảm chuẩn 1 người (${beforeLeaveTotals.onlineCount} -> ${afterLeaveTotals.onlineCount}), giữ nguyên 100% Xu (${afterLeaveTotals.totalCoins} Xu) & Tim (${afterLeaveTotals.totalLikes} Tim)`);
+    passedTests++;
+
+    // -------------------------------------------------------------------------
+    // TEST CASE 9: Kết nối với username mới -> Tự động xóa sạch dữ liệu khán giả cũ
+    // -------------------------------------------------------------------------
+    console.log('\n[Test 9] Kiểm tra: Kết nối với username mới -> Tự động xóa sạch dữ liệu khán giả cũ...');
+
+    tiktokHandler.currentUsername = 'streamer_cu';
+    if (stateManager.players.size === 0) {
+      stateManager.getOrCreatePlayer('user_cu_01', 'Khán Giả Cũ', '');
+    }
+    const countBeforeSwitch = stateManager.players.size;
+
+    try {
+      await tiktokHandler.connect('streamer_moi_999');
+    } catch {
+      // Expected to fail network connection since 'streamer_moi_999' is not a live stream
+    } finally {
+      tiktokHandler.disconnect();
+    }
+
+    if (stateManager.players.size !== 0) {
+      throw new Error(`Test 9 Thất bại: Dữ liệu user cũ chưa được xóa khi kết nối username mới! Còn ${stateManager.players.size} người.`);
+    }
+    if (stateManager.giftSummary.size !== 0) {
+      throw new Error(`Test 9 Thất bại: Dữ liệu quà cũ chưa được xóa khi kết nối username mới!`);
+    }
+
+    console.log(`✅ [Test 9 ĐẠT] Đã tự động xóa sạch ${countBeforeSwitch} khán giả và dữ liệu quà cũ khi kết nối sang username mới!`);
     passedTests++;
 
     console.log('\n========================================================');

@@ -219,6 +219,22 @@ tiktokHandler.setEventCallback((eventName, data) => {
       break;
     }
 
+    case 'session_reset': {
+      io.emit('live:session_reset', data);
+      io.emit('admin:players_updated', []);
+      io.emit('admin:gift_breakdown_updated', {
+        breakdown: [],
+        stats: stateManager.getGiftStats(),
+        recentTransactions: []
+      });
+      io.emit('admin:event_log', {
+        type: 'status',
+        text: `[KÊNH MỚI] Đã làm mới toàn bộ dữ liệu khán giả cũ để kết nối phòng live @${data.username}`,
+        time: new Date().toLocaleTimeString('vi-VN')
+      });
+      break;
+    }
+
     case 'tiktok_status': {
       io.emit('tiktok_status', data);
       io.emit('admin:event_log', {
@@ -364,7 +380,9 @@ io.on('connection', (socket) => {
   // Admin: Connect to TikTok
   socket.on('admin:tiktok_connect', async (data) => {
     try {
-      await tiktokHandler.connect(data.username);
+      const username = String(data?.username || '').replace(/^@/, '').trim();
+      const resetSession = data?.resetSession !== false;
+      await tiktokHandler.connect(username, { resetSession });
     } catch (err) {
       socket.emit('admin:error', { message: err.message });
     }
