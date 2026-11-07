@@ -8,11 +8,14 @@ export const characters = {
     textures: {}, // { map: 'cr7/textures/color.png', normalMap: 'cr7/textures/normal.png', roughnessMap: 'cr7/textures/roughness.png' }
     textureDirectory: 'cr7/textures/',
     textureFiles: {}, // Original image basename -> local path, e.g. { 'Body_D.png': 'cr7/textures/color.png' }
-    positionScale: 'auto'
+    positionScale: 'auto',
+    // Mini models are independent, so six players never load the large star model.
+    mini: { model: '', clips: {}, textureDirectory: 'cr7/mini/textures/' }
   },
   m10: {
     model: '', height: 1.8, rotationY: 0,
     clips: {}, aliases: {}, textures: {}, textureDirectory: 'm10/textures/', textureFiles: {},
-    positionScale: 'auto'
+    positionScale: 'auto',
+    mini: { model: '', clips: {}, textureDirectory: 'm10/mini/textures/' }
   }
 };

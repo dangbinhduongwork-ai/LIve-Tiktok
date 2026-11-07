@@ -1,5 +1,7 @@
 # Báo cáo giao diện 3D — 07/11/2026
 
+> Đây là báo cáo bản sân dọc trước khi đổi theme. Giao diện hiện tại dùng sân ngang neon hologram; xem [báo cáo front-theme](QA-front-theme.md) và [ảnh mới](../../docs/screenshots/front-theme/).
+
 Đã tiếp tục từ phần code 3D đang có trong working tree và hoàn thiện bước A của `BRIEF-live-tiktok-giao-dien-3d.md`. Phần code thay đổi trong đợt tiếp tục này nằm ở `public/game/`; ảnh lưu tại `docs/screenshots/`. Không sửa luật server, hợp đồng socket, dependency trong package.json, dữ liệu live hoặc cấu hình bí mật. Không commit.
 
 ## Kết quả

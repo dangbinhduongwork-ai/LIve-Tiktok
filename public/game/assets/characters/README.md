@@ -2,6 +2,27 @@
 
 Sửa **`public/game/characters.config.js`**, rồi F5 `/game/`. Không cần build hoặc khởi động lại server. Mọi đường dẫn bên dưới tính từ thư mục này.
 
+## Ngôi sao lớn và cầu thủ nhỏ
+
+`model`, `clips`, `textures` ở cấp đội là ngôi sao lớn. Cầu thủ nhỏ có cấu hình độc lập trong `mini`, dùng cùng loader và quy tắc animation:
+
+```js
+cr7: {
+  model: 'cr7/model.glb', height: 1.8, clips: {},
+  mini: {
+    model: 'cr7/mini/model.glb',
+    clips: {},
+    textureDirectory: 'cr7/mini/textures/'
+  }
+}
+```
+
+Đặt file tương tự trong `m10/mini/` cho đội M10. `mini` nhận các tùy chọn `height`, `rotationY`, `aliases`, `textures`, `textureFiles`, `positionScale` giống ngôi sao. Nếu mini trống hoặc file lỗi, dùng mini tạm; không tự tải lại model lớn của ngôi sao cho cả sáu cầu thủ.
+
+Trong `view.config.js`, `miniPlayers.perTeam` mặc định **3**, tối đa **6** để giữ chi phí dựng hình có giới hạn. `miniPlayers.height` là chiều cao chung (2,65 đơn vị sân); `mini.height` nếu khai báo sẽ ghi đè. `stars.height` là chiều cao trình bày theo pixel (hiện 420px), độc lập với chiều cao chuẩn hóa model.
+
+Giữ model mini nhẹ vì được dựng nhiều lần. Hành động cổ vũ, SIUUU/giơ tay là chuyển động code của nhân vật tạm; model thật dùng các clip bạn cung cấp và fallback gần nhất. Không có âm thanh hô SIUUU trong đợt này. Chưa xác nhận clip Mixamo dành riêng cho các động tác này.
+
 ## GLB / GLTF có animation
 
 1. Chép model vào `cr7/model.glb` hoặc `m10/model.glb`.
@@ -60,6 +81,6 @@ Clip có nhiều animation có thể chọn bằng `kick: { file: 'cr7/Actions.g
 
 ## Kiểm tra
 
-Mở `/game/character-test.html`. Trang tự kiểm tra alias, fallback, nạp GLB/GLTF/FBX mẫu, animation, chạm đất, xương và file thiếu. Các mẫu trong `fixtures/` là hình học đơn giản tự tạo, **chưa thay thế kiểm tra model Mixamo thật**.
+Mở `/game/character-test.html`. Trang chạy 18 kiểm tra alias, fallback, nạp GLB/GLTF/FBX mẫu, animation, chạm đất, xương, file thiếu và model mini độc lập. Các mẫu trong `fixtures/` là hình học đơn giản tự tạo, **chưa thay thế kiểm tra model Mixamo thật**.
 
 Để thử model của bạn, đặt model vào thư mục đội, sửa config rồi mở game thật. `?quality=low` tắt bóng đổ và giảm hạt. Không có âm thanh ở đợt giao diện này.

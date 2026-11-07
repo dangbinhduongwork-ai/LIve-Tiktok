@@ -4,6 +4,7 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { characters as defaults } from './characters.config.js';
+import { viewConfig } from './view.config.js';
 import { canonicalBone, mapClips, resolveClip, inferPositionScale, localAssetUrl } from './character-rules.js';
 
 let settings = { configs: defaults, teams: {}, low: false, warn: () => {} };
@@ -41,11 +42,11 @@ function createPlaceholder(team, definition) {
   const root = new THREE.Group(), body = new THREE.Group(); root.add(body);
   const color = settings.teams[team]?.color || (team === 'cr7' ? '#ef4444' : '#3b82f6');
   const shirt = new THREE.MeshStandardMaterial({ color, roughness: 0.8 });
-  const white = new THREE.MeshStandardMaterial({ color: '#f4efdc', roughness: 0.9 });
+  const white = new THREE.MeshStandardMaterial({ color: settings.teams[team]?.lightColor || '#f4f6ff', roughness: 0.7 });
   const skin = new THREE.MeshStandardMaterial({ color: team === 'cr7' ? '#c48d69' : '#d5a27f', roughness: 0.9 });
   const dark = new THREE.MeshStandardMaterial({ color: '#18241e', roughness: 0.7 });
   const hair = new THREE.MeshStandardMaterial({ color: '#251f1a', roughness: 0.95 });
-  const segments = settings.low ? 8 : 12;
+  const segments = definition.mini ? 6 : settings.low ? 8 : 12;
   function part(geometry, material, position, parent = body) {
     const mesh = new THREE.Mesh(geometry, material); mesh.position.set(...position); mesh.castShadow = !settings.low; parent.add(mesh); return mesh;
   }
@@ -56,11 +57,13 @@ function createPlaceholder(team, definition) {
   part(new THREE.SphereGeometry(0.25, segments, 8, 0, Math.PI * 2, 0, Math.PI * 0.48), hair, [0, 0.025, -0.015], head);
   for (const x of [-0.083, 0.083]) part(new THREE.SphereGeometry(0.025, 6, 6), dark, [x, 0.015, 0.224], head);
   part(new THREE.SphereGeometry(0.043, 6, 6), skin, [0, -0.04, 0.245], head);
-  const arms = [], legs = [];
+  if (team === 'm10' && !definition.mini) part(new THREE.SphereGeometry(0.246, segments, 6, 0, Math.PI * 2, Math.PI * 0.58, Math.PI * 0.4), hair, [0, 0, 0], head);
+  const arms = [], legs = [], fingers = [];
   for (const sign of [-1, 1]) {
     const arm = new THREE.Group(); arm.position.set(sign * 0.34, 1.23, 0); body.add(arm); arms.push(arm);
     part(new THREE.CapsuleGeometry(0.105, 0.1, 2, segments), shirt, [0, -0.06, 0], arm);
     part(new THREE.CapsuleGeometry(0.075, 0.22, 2, segments), skin, [0, -0.28, 0], arm);
+    if (!definition.mini) { const finger = part(new THREE.CylinderGeometry(0.025, 0.027, 0.13, 6), skin, [0, -0.50, 0.025], arm); finger.visible = false; fingers.push(finger); }
     const leg = new THREE.Group(); leg.position.set(sign * 0.145, 0.73, 0); body.add(leg); legs.push(leg);
     part(new THREE.CapsuleGeometry(0.105, 0.22, 2, segments), skin, [0, -0.20, 0], leg);
     part(new THREE.CapsuleGeometry(0.095, 0.18, 2, segments), white, [0, -0.44, 0], leg);
@@ -73,16 +76,17 @@ function createPlaceholder(team, definition) {
     if (sign < 0) number.rotation.y = Math.PI;
   }
   root.scale.setScalar((definition.height || 1.8) / 1.8);
-  let state = 'idle', elapsed = 0, oneShot = false, returnTo = 'idle';
+  let state = 'idle', elapsed = 0, oneShot = false, returnTo = 'idle', style = '';
   return {
     object: root,
     get state() { return state; },
     play(next, opts = {}) {
       state = next; elapsed = 0; oneShot = opts.loop === undefined ? ['kick', 'celebrate', 'jump'].includes(next) : !opts.loop;
-      returnTo = opts.returnTo || 'idle';
+      returnTo = opts.returnTo || 'idle'; style = opts.style || '';
     },
     update(dt) {
       elapsed += dt;
+      body.position.x = body.position.z = 0;
       body.position.y = Math.sin(elapsed * 3) * 0.018; body.rotation.set(0, 0, 0); head.rotation.x = 0;
       arms[0].rotation.set(0, 0, -0.12); arms[1].rotation.set(0, 0, 0.12);
       legs[0].rotation.x = 0; legs[1].rotation.x = 0;
@@ -94,11 +98,28 @@ function createPlaceholder(team, definition) {
       } else if (state === 'kick') {
         legs[1].rotation.x = -Math.sin(Math.min(elapsed / 0.8, 1) * Math.PI) * 1.5;
         arms[0].rotation.z = -0.6; arms[1].rotation.z = 0.6;
+      } else if (state === 'celebrate' && style === 'cheer') {
+        body.position.y = Math.abs(Math.sin(elapsed * 4)) * 0.05;
+        arms[0].rotation.z = -1.1; arms[1].rotation.z = 1.1;
+        if (team === 'cr7') { arms[0].rotation.z = -.12; arms[1].rotation.z += Math.sin(elapsed * 7) * .45; }
+        else { arms[0].rotation.x = arms[1].rotation.x = -1.1; arms[0].rotation.z += Math.sin(elapsed * 8) * .35; arms[1].rotation.z -= Math.sin(elapsed * 8) * .35; }
+      } else if (state === 'celebrate' && style === 'goal' && !definition.mini) {
+        if (team === 'cr7') {
+          const jump = Math.max(0, Math.sin(Math.min(1, Math.max(0, (elapsed - .3) / 1.2)) * Math.PI));
+          body.position.y = jump * .42; body.rotation.y = elapsed < 1.5 ? Math.max(0, elapsed - .3) / 1.2 * Math.PI * 2 : Math.PI * 2;
+          body.position.z = Math.min(elapsed * .18, .22);
+          arms[0].rotation.z = elapsed < 1.5 ? -1.8 : -.95; arms[1].rotation.z = -arms[0].rotation.z;
+          legs[0].rotation.z = .15; legs[1].rotation.z = -.15;
+        } else { arms[0].rotation.z = -2.95; arms[1].rotation.z = 2.95; head.rotation.x = -.25; }
       } else if (state === 'celebrate' || state === 'jump') {
         body.position.y = Math.max(0, Math.sin(elapsed * 6)) * 0.42;
         arms[0].rotation.z = -2.5; arms[1].rotation.z = 2.5;
         body.rotation.y = Math.sin(elapsed * 3) * 0.15;
       } else if (state === 'defeated') { body.rotation.x = 0.2; head.rotation.x = 0.35; arms[0].rotation.x = 0.18; arms[1].rotation.x = 0.18; }
+      else if (style === 'warmup') { arms[0].rotation.z = -.35 - Math.sin(elapsed * 2) * .2; arms[1].rotation.z = .35; body.rotation.z = Math.sin(elapsed * 2) * .04; }
+      else if (style === 'tense') { head.rotation.x = .08; arms[0].rotation.x = arms[1].rotation.x = -.3; }
+      for (const finger of fingers) finger.visible = state === 'celebrate' && style === 'goal' && team === 'm10';
+      if (style !== 'goal') { legs[0].rotation.z = legs[1].rotation.z = 0; }
       if (oneShot && elapsed > (state === 'kick' ? 0.85 : state === 'jump' ? 1.1 : 2.8)) { state = returnTo; elapsed = 0; oneShot = false; }
     }, dispose() { disposeObject(root); }
   };
@@ -244,17 +265,18 @@ async function applyMaterials(model, definition, manager, team) {
 }
 
 // Synchronous facade: the placeholder is immediately playable while assets load.
-export function createCharacter(teamId) {
-  const definition = settings.configs[teamId] || {};
-  const object3d = new THREE.Group(); object3d.name = `character-${teamId}`;
+export function createCharacter(teamId, { variant = 'star', index = 0 } = {}) {
+  const config = settings.configs[teamId] || {};
+  const definition = variant === 'mini' ? { ...config.mini, height: config.mini?.height || viewConfig.miniPlayers.height, mini: true } : config;
+  const object3d = new THREE.Group(); object3d.name = `${variant}-${teamId}-${index}`;
   let body = createPlaceholder(teamId, definition); object3d.add(body.object);
   let disposed = false, lastState = 'idle', lastOptions = {}, mixer = null, current = null;
   const resources = [];
   const character = {
-    object3d, kind: 'placeholder', diagnostics: { source: definition.model || 'placeholder' },
+    object3d, height: definition.height || 1.8, variant, kind: 'placeholder', diagnostics: { source: definition.model || 'placeholder' },
     get state() { return body.state; },
     play(stateName, opts = {}) {
-      if (disposed || (body.state === stateName && !opts.restart && !!lastOptions.loop === !!opts.loop)) return;
+      if (disposed || (body.state === stateName && !opts.restart && !!lastOptions.loop === !!opts.loop && lastOptions.style === opts.style)) return;
       lastState = stateName; lastOptions = opts; body.play(stateName, opts);
     },
     update(dt) { if (!disposed) body.update(Math.min(dt, 0.1)); },
@@ -324,3 +346,5 @@ export function createCharacter(teamId) {
   })().finally(() => { if (disposed) for (const resource of resources) resource.dispose(); });
   return character;
 }
+
+export function createMiniPlayer(teamId, index) { return createCharacter(teamId, { variant: 'mini', index }); }

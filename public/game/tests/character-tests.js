@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { configureCharacters, createCharacter, prepareClip, managerFor } from '../characters.js';
+import { configureCharacters, createCharacter, createMiniPlayer, prepareClip, managerFor } from '../characters.js';
 import { characters } from '../characters.config.js';
 import { mapClips, resolveClip, inferPositionScale, canonicalBone, localAssetUrl } from '../character-rules.js';
 
@@ -98,6 +98,22 @@ await test('Dừng trong lúc tải không gắn model đã huỷ lên sân', as
   configureCharacters({configs:{cr7:{model:'fixtures/sample.glb'}}});
   const char=createCharacter('cr7'); char.dispose(); await char.ready;
   assert(char.object3d.children.length===0,'Model đã huỷ vẫn xuất hiện');
+});
+await test('Model mini nạp độc lập và giữ chiều cao cấu hình', async () => {
+  configureCharacters({configs:{cr7:{model:'fixtures/sample.fbx',height:1.8,mini:{model:'fixtures/rig.glb',height:2.6}}}});
+  const star=createCharacter('cr7'),mini=createMiniPlayer('cr7',0);pending.push(star,mini);await Promise.all([star.ready,mini.ready]);
+  assert(star.kind==='model'&&mini.kind==='model','Không nạp được cả hai model');
+  assert(star.diagnostics.source==='fixtures/sample.fbx'&&mini.diagnostics.source==='fixtures/rig.glb','Đã dùng nhầm file model');
+  near(mini.diagnostics.fit.height,2.6);assert(mini.variant==='mini','Sai biến thể');
+});
+await test('Mini thiếu file vẫn chạy, không thay model ngôi sao', async () => {
+  configureCharacters({configs:{cr7:{model:'fixtures/sample.glb',mini:{model:'fixtures/missing-model.glb'}}}});
+  const star=createCharacter('cr7'),mini=createMiniPlayer('cr7',1);pending.push(star,mini);await Promise.all([star.ready,mini.ready]);
+  assert(star.kind==='model'&&mini.kind==='placeholder','Fallback ảnh hưởng model còn lại');mini.play('run');mini.update(.1);
+});
+await test('Mini không cấu hình không tải lại model ngôi sao', async () => {
+  configureCharacters({configs:{cr7:{model:'fixtures/sample.glb'}}});const mini=createMiniPlayer('cr7',2);pending.push(mini);await mini.ready;
+  assert(mini.kind==='placeholder'&&mini.diagnostics.source==='placeholder','Mini dùng model lớn ngoài ý muốn');
 });
 for(const char of pending)char.dispose();
 configureCharacters({configs:characters});

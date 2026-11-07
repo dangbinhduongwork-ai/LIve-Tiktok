@@ -1,0 +1,578 @@
+{
+  "checkedAt": "2026-11-07T06:18:58.300Z",
+  "browser": "156.0.8078.80",
+  "characterTests": {
+    "done": true,
+    "results": [
+      {
+        "name": "Alias không phân biệt hoa thường, khớp chuỗi con",
+        "passed": true
+      },
+      {
+        "name": "Thiếu clip dùng run/idle; không clip vẫn hợp lệ",
+        "passed": true
+      },
+      {
+        "name": "Đường dẫn chỉ dùng tài nguyên cục bộ, có bỏ cache",
+        "passed": true
+      },
+      {
+        "name": "Texture FBX trỏ về file local, giữ đường dẫn ghi đè",
+        "passed": true
+      },
+      {
+        "name": "Chuẩn hóa tên xương, lệch đơn vị cm/m và root motion",
+        "passed": true
+      },
+      {
+        "name": "Nạp GLB, chiều cao 1,8, chạm đất và animation không phá scale",
+        "passed": true
+      },
+      {
+        "name": "Nạp GLTF, chiều cao 1,8, chạm đất và animation không phá scale",
+        "passed": true
+      },
+      {
+        "name": "Nạp FBX, chiều cao 1,8, chạm đất và animation không phá scale",
+        "passed": true
+      },
+      {
+        "name": "GLB có xương: đo 24 mẫu và chân chạm đất",
+        "passed": true
+      },
+      {
+        "name": "FBX clip riêng không mesh, ghép vào model GLB",
+        "passed": true
+      },
+      {
+        "name": "Clip một lần quay về idle/run và có thể phát lại",
+        "passed": true
+      },
+      {
+        "name": "Thiếu file model dùng cầu thủ tạm và cảnh báo",
+        "passed": true
+      },
+      {
+        "name": "Thiếu clip riêng giữ model và clip gần nhất",
+        "passed": true
+      },
+      {
+        "name": "Cấu hình trống trả cùng giao diện và dispose an toàn",
+        "passed": true
+      },
+      {
+        "name": "Dừng trong lúc tải không gắn model đã huỷ lên sân",
+        "passed": true
+      },
+      {
+        "name": "Model mini nạp độc lập và giữ chiều cao cấu hình",
+        "passed": true
+      },
+      {
+        "name": "Mini thiếu file vẫn chạy, không thay model ngôi sao",
+        "passed": true
+      },
+      {
+        "name": "Mini không cấu hình không tải lại model ngôi sao",
+        "passed": true
+      }
+    ],
+    "warnings": [
+      "cr7: Không nạp được tài nguyên missing-model.glb; kiểm tra file/texture cục bộ.",
+      "cr7: Không nạp được tài nguyên missing-model.glb; kiểm tra file/texture cục bộ.",
+      "cr7: Dùng nhân vật tạm: fetch for \"http://127.0.0.1:62575/game/assets/characters/fixtures/missing-model.glb\" responded with 404: Not Found",
+      "cr7: Không nạp được tài nguyên missing-clip.fbx; kiểm tra file/texture cục bộ.",
+      "cr7: Clip kick lỗi (fetch for \"http://127.0.0.1:62575/game/assets/characters/fixtures/missing-clip.fbx\" responded with 404: Not Found); dùng clip gần nhất.",
+      "cr7: Không nạp được tài nguyên missing-model.glb; kiểm tra file/texture cục bộ.",
+      "cr7: Không nạp được tài nguyên missing-model.glb; kiểm tra file/texture cục bộ.",
+      "cr7: Dùng nhân vật tạm: fetch for \"http://127.0.0.1:62575/game/assets/characters/fixtures/missing-model.glb\" responded with 404: Not Found"
+    ],
+    "passed": 18,
+    "total": 18
+  },
+  "themeResults": [
+    {
+      "quality": "normal",
+      "passed": 8,
+      "total": 8,
+      "results": [
+        {
+          "name": "CR7 trái, M10 phải; bóng −1000/0/+1000 và thanh lực cùng chiều",
+          "passed": true
+        },
+        {
+          "name": "Ngôi sao không che bóng và hai miệng khung thành trong lúc đá",
+          "passed": true
+        },
+        {
+          "name": "Mỗi đội có số mini theo config; đóng băng dừng cả di chuyển và animation",
+          "passed": true
+        },
+        {
+          "name": "LED tăng theo comment/tim rồi giảm khi hết tương tác",
+          "passed": true
+        },
+        {
+          "name": "Kết quả có tỉ số/top donor; hướng dẫn không bị panel che",
+          "passed": true
+        },
+        {
+          "name": "HUD đúng vùng an toàn và chữ tỉ số/đồng hồ đủ lớn",
+          "passed": true
+        },
+        {
+          "name": "Chế độ chất lượng điều khiển camera, shadow và số LED",
+          "passed": true
+        },
+        {
+          "name": "Nhiều hiệu ứng liên tiếp dùng pool, không sinh thêm geometry",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "quality": "low",
+      "passed": 8,
+      "total": 8,
+      "results": [
+        {
+          "name": "CR7 trái, M10 phải; bóng −1000/0/+1000 và thanh lực cùng chiều",
+          "passed": true
+        },
+        {
+          "name": "Ngôi sao không che bóng và hai miệng khung thành trong lúc đá",
+          "passed": true
+        },
+        {
+          "name": "Mỗi đội có số mini theo config; đóng băng dừng cả di chuyển và animation",
+          "passed": true
+        },
+        {
+          "name": "LED tăng theo comment/tim rồi giảm khi hết tương tác",
+          "passed": true
+        },
+        {
+          "name": "Kết quả có tỉ số/top donor; hướng dẫn không bị panel che",
+          "passed": true
+        },
+        {
+          "name": "HUD đúng vùng an toàn và chữ tỉ số/đồng hồ đủ lớn",
+          "passed": true
+        },
+        {
+          "name": "Chế độ chất lượng điều khiển camera, shadow và số LED",
+          "passed": true
+        },
+        {
+          "name": "Nhiều hiệu ứng liên tiếp dùng pool, không sinh thêm geometry",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "mobileQA": {
+    "quality": "normal",
+    "passed": 8,
+    "total": 8,
+    "results": [
+      {
+        "name": "CR7 trái, M10 phải; bóng −1000/0/+1000 và thanh lực cùng chiều",
+        "passed": true
+      },
+      {
+        "name": "Ngôi sao không che bóng và hai miệng khung thành trong lúc đá",
+        "passed": true
+      },
+      {
+        "name": "Mỗi đội có số mini theo config; đóng băng dừng cả di chuyển và animation",
+        "passed": true
+      },
+      {
+        "name": "LED tăng theo comment/tim rồi giảm khi hết tương tác",
+        "passed": true
+      },
+      {
+        "name": "Kết quả có tỉ số/top donor; hướng dẫn không bị panel che",
+        "passed": true
+      },
+      {
+        "name": "HUD đúng vùng an toàn và chữ tỉ số/đồng hồ đủ lớn",
+        "passed": true
+      },
+      {
+        "name": "Chế độ chất lượng điều khiển camera, shadow và số LED",
+        "passed": true
+      },
+      {
+        "name": "Nhiều hiệu ứng liên tiếp dùng pool, không sinh thêm geometry",
+        "passed": true
+      }
+    ]
+  },
+  "fpsResults": [
+    {
+      "fps": 60,
+      "averageFps": 59.97660807841119,
+      "p95FrameMs": 16.799999237060547,
+      "samples": 600,
+      "quality": "normal",
+      "pixelRatio": 1,
+      "drawCalls": 331,
+      "triangles": 18308,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 730 (0x00004682) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "connected": false,
+      "renderer": true,
+      "characters": {
+        "cr7": {
+          "kind": "placeholder",
+          "source": "placeholder"
+        },
+        "m10": {
+          "kind": "placeholder",
+          "source": "placeholder"
+        }
+      },
+      "minis": {
+        "cr7": [
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          },
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          },
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          }
+        ],
+        "m10": [
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          },
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          },
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          }
+        ]
+      },
+      "ledBars": 96,
+      "warnings": []
+    },
+    {
+      "fps": 60,
+      "averageFps": 59.97361042403916,
+      "p95FrameMs": 16.799999237060547,
+      "samples": 600,
+      "quality": "low",
+      "pixelRatio": 1,
+      "drawCalls": 204,
+      "triangles": 11040,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 730 (0x00004682) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "connected": false,
+      "renderer": true,
+      "characters": {
+        "cr7": {
+          "kind": "placeholder",
+          "source": "placeholder"
+        },
+        "m10": {
+          "kind": "placeholder",
+          "source": "placeholder"
+        }
+      },
+      "minis": {
+        "cr7": [
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          },
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          },
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          }
+        ],
+        "m10": [
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          },
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          },
+          {
+            "kind": "placeholder",
+            "source": "placeholder"
+          }
+        ]
+      },
+      "ledBars": 40,
+      "warnings": []
+    }
+  ],
+  "liveQA": {
+    "phases": [
+      {
+        "phase": "OVERTIME",
+        "matchId": 1,
+        "active": 15,
+        "at": "2026-11-07T06:06:29.631Z"
+      },
+      {
+        "phase": "WAITING",
+        "matchId": 2,
+        "active": 15,
+        "at": "2026-11-07T06:06:29.729Z"
+      },
+      {
+        "phase": "PLAYING",
+        "matchId": 2,
+        "active": 15,
+        "at": "2026-11-07T06:06:34.721Z"
+      },
+      {
+        "phase": "OVERTIME",
+        "matchId": 2,
+        "active": 13,
+        "at": "2026-11-07T06:09:04.713Z"
+      },
+      {
+        "phase": "RESULT",
+        "matchId": 2,
+        "active": 15,
+        "at": "2026-11-07T06:09:34.716Z"
+      },
+      {
+        "phase": "WAITING",
+        "matchId": 3,
+        "active": 15,
+        "at": "2026-11-07T06:09:49.666Z"
+      },
+      {
+        "phase": "PLAYING",
+        "matchId": 3,
+        "active": 15,
+        "at": "2026-11-07T06:09:54.646Z"
+      }
+    ],
+    "eventCounts": {
+      "team_join": 30,
+      "gift_skill": 14,
+      "freeze": 2,
+      "overtime": 1,
+      "goal": 1,
+      "result": 1
+    },
+    "beforeReload": {
+      "matchId": 3,
+      "score": {
+        "cr7": 0,
+        "m10": 0
+      }
+    },
+    "afterReload": {
+      "matchId": 3,
+      "score": {
+        "cr7": 0,
+        "m10": 0
+      }
+    },
+    "offline": {
+      "renderer": true,
+      "guide": "GÕ 7 = CR7·GÕ 10 = M10"
+    },
+    "reconnected": true,
+    "errors": []
+  },
+  "robustnessQA": {
+    "modelQA": {
+      "stars": {
+        "cr7": {
+          "kind": "model",
+          "source": "fixtures/rig.glb",
+          "fit": {
+            "method": "bones",
+            "samples": 24,
+            "sourceHeight": 2.049999952316284,
+            "scale": 0.8780488009115266,
+            "height": 1.8,
+            "groundY": 0
+          },
+          "clips": {
+            "idle": "Breathing Idle",
+            "run": "Run",
+            "kick": "Soccer Kick",
+            "celebrate": "Victory",
+            "defeated": "Breathing Idle",
+            "jump": "Victory"
+          }
+        },
+        "m10": {
+          "kind": "placeholder",
+          "source": "placeholder"
+        }
+      },
+      "minis": {
+        "cr7": [
+          {
+            "kind": "model",
+            "source": "fixtures/sample.fbx",
+            "fit": {
+              "method": "mesh",
+              "samples": 0,
+              "sourceHeight": 2,
+              "scale": 1.325,
+              "height": 2.65,
+              "groundY": 0
+            },
+            "clips": {
+              "idle": "Breathing Idle",
+              "run": "Breathing Idle",
+              "kick": "Breathing Idle",
+              "celebrate": "Breathing Idle",
+              "defeated": "Breathing Idle",
+              "jump": "Breathing Idle"
+            }
+          },
+          {
+            "kind": "model",
+            "source": "fixtures/sample.fbx",
+            "fit": {
+              "method": "mesh",
+              "samples": 0,
+              "sourceHeight": 2,
+              "scale": 1.325,
+              "height": 2.65,
+              "groundY": 0
+            },
+            "clips": {
+              "idle": "Breathing Idle",
+              "run": "Breathing Idle",
+              "kick": "Breathing Idle",
+              "celebrate": "Breathing Idle",
+              "defeated": "Breathing Idle",
+              "jump": "Breathing Idle"
+            }
+          },
+          {
+            "kind": "model",
+            "source": "fixtures/sample.fbx",
+            "fit": {
+              "method": "mesh",
+              "samples": 0,
+              "sourceHeight": 2,
+              "scale": 1.325,
+              "height": 2.65,
+              "groundY": 0
+            },
+            "clips": {
+              "idle": "Breathing Idle",
+              "run": "Breathing Idle",
+              "kick": "Breathing Idle",
+              "celebrate": "Breathing Idle",
+              "defeated": "Breathing Idle",
+              "jump": "Breathing Idle"
+            }
+          }
+        ],
+        "m10": [
+          {
+            "kind": "placeholder",
+            "source": "fixtures/missing-model.glb",
+            "error": "fetch for \"http://127.0.0.1:62575/game/assets/characters/fixtures/missing-model.glb\" responded with 404: Not Found"
+          },
+          {
+            "kind": "placeholder",
+            "source": "fixtures/missing-model.glb",
+            "error": "fetch for \"http://127.0.0.1:62575/game/assets/characters/fixtures/missing-model.glb\" responded with 404: Not Found"
+          },
+          {
+            "kind": "placeholder",
+            "source": "fixtures/missing-model.glb",
+            "error": "fetch for \"http://127.0.0.1:62575/game/assets/characters/fixtures/missing-model.glb\" responded with 404: Not Found"
+          }
+        ]
+      }
+    },
+    "countQA": {
+      "cr7": 2,
+      "m10": 2
+    },
+    "fontQA": {
+      "renderer": true,
+      "clock": "01:26"
+    },
+    "avatarQA": true,
+    "recoveryQA": {
+      "renderer": true,
+      "minis": 6
+    }
+  },
+  "m10ResultQA": {
+    "winner": "m10",
+    "trophy": true,
+    "label": "✦ Tuấn M10 · 990 XU"
+  },
+  "preserved": {
+    "src/gameEngine.js": true,
+    "src/gameConfig.js": true,
+    "src/server.js": true,
+    ".env": true,
+    "data/admin-token.txt": true,
+    "data/session.json": true
+  },
+  "screenshots": [
+    {
+      "scene": "waiting",
+      "guide": true,
+      "size": "1080x1920"
+    },
+    {
+      "scene": "playing",
+      "guide": true,
+      "size": "1080x1920"
+    },
+    {
+      "scene": "goal",
+      "guide": true,
+      "size": "1080x1920"
+    },
+    {
+      "scene": "overtime",
+      "guide": true,
+      "size": "1080x1920"
+    },
+    {
+      "scene": "freeze",
+      "guide": true,
+      "size": "1080x1920"
+    },
+    {
+      "scene": "golden",
+      "guide": true,
+      "size": "1080x1920"
+    },
+    {
+      "scene": "result",
+      "guide": true,
+      "size": "1080x1920"
+    },
+    {
+      "scene": "empty",
+      "guide": true,
+      "size": "1080x1920"
+    }
+  ],
+  "unexpectedJavaScriptErrors": []
+}

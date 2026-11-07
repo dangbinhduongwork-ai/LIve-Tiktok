@@ -6,10 +6,10 @@ export function scenario(name = 'playing') {
     ballPos: 280, fieldLimit: 1000, forces: { cr7: 48, m10: 31 },
     viewerCount: 1286, activeJoined: 15, goalPauseLeft: 0, result: null,
     teams: {
-      cr7: { name: 'CR7', color: '#ef4444', shirtNumber: 7, keywords: ['7', 'cr7'], count: 8, frozen: false, freezeLeft: 0, top3: [
+      cr7: { name: 'CR7', color: '#ef4444', lightColor: '#fff1f2', shirtNumber: 7, keywords: ['7', 'cr7'], count: 8, likeBoost: .18, frozen: false, freezeLeft: 0, top3: [
         { userId: 'red1', nickname: 'Minh Anh', coins: 1250 }, { userId: 'red2', nickname: 'Huy CR7', coins: 520 }, { userId: 'red3', nickname: 'Bảo Ngọc', coins: 199 }
       ] },
-      m10: { name: 'M10', color: '#3b82f6', shirtNumber: 10, keywords: ['10', 'm10'], count: 7, frozen: false, freezeLeft: 0, top3: [
+      m10: { name: 'M10', color: '#3b82f6', lightColor: '#eff6ff', shirtNumber: 10, keywords: ['10', 'm10'], count: 7, likeBoost: .09, frozen: false, freezeLeft: 0, top3: [
         { userId: 'blue1', nickname: 'Tuấn M10', coins: 990 }, { userId: 'blue2', nickname: 'Hà Linh', coins: 450 }, { userId: 'blue3', nickname: 'Quốc Việt', coins: 150 }
       ] }
     },
@@ -20,7 +20,7 @@ export function scenario(name = 'playing') {
     state.phase = name === 'waiting' ? 'WAITING' : 'PLAYING'; state.timeLeft = name === 'waiting' ? 5 : 128;
     state.score = { cr7: 0, m10: 0 }; state.viewerCount = 0; state.activeJoined = 0; state.ballPos = -140;
     state.forces = name === 'waiting' ? { cr7: 0, m10: 0 } : { cr7: 6, m10: 9 }; state.smallBalls = [];
-    for (const team of Object.values(state.teams)) { team.top3 = []; team.count = 0; }
+    for (const team of Object.values(state.teams)) { team.top3 = []; team.count = 0; team.likeBoost = 0; }
   }
   if (name === 'goal') { state.goalPauseLeft = 3; state.ballPos = 0; events.push({ type: 'goal', team: 'cr7' }); }
   if (name === 'overtime') { state.phase = 'OVERTIME'; state.timeLeft = 24; events.push({ type: 'overtime' }); }
