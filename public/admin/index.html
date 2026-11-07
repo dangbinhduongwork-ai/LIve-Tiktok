@@ -242,10 +242,10 @@
               </button>
             </div>
             <div style="margin-top: 6px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
-              <label style="font-size: 11px; color: #94a3b8; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;">
-                <input type="checkbox" id="chkAutoResetNewUser" checked style="cursor: pointer; accent-color: #38bdf8;" />
-                <span>Tự động làm mới dữ liệu khán giả cũ khi kết nối kênh mới</span>
-              </label>
+              <span style="font-size: 11px; color: #94a3b8; display: inline-flex; align-items: center; gap: 5px;">
+                <svg class="svg-icon sm" style="color: #38bdf8;"><use href="#icon-zap"/></svg>
+                Tự động xóa dữ liệu khi đổi user mới. Khi ngắt vẫn giữ nguyên dữ liệu.
+              </span>
               <button id="btnQuickClearData" class="btn-text" style="font-size: 11px; color: #f87171;" title="Xóa toàn bộ khán giả và quà cũ ngay lập tức">
                 Xóa dữ liệu cũ
               </button>
@@ -850,6 +850,6 @@
 
   <!-- Scripts -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="admin.js?v=13"></script>
+  <script src="admin.js?v=14"></script>
 </body>
 </html>

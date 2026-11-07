@@ -418,6 +418,7 @@ async function runTests() {
     // -------------------------------------------------------------------------
     console.log('\n[Test 9] Kiểm tra: Kết nối với username mới -> Tự động xóa sạch dữ liệu khán giả cũ...');
 
+    tiktokHandler.lastConnectedUsername = 'streamer_cu';
     tiktokHandler.currentUsername = 'streamer_cu';
     if (stateManager.players.size === 0) {
       stateManager.getOrCreatePlayer('user_cu_01', 'Khán Giả Cũ', '');

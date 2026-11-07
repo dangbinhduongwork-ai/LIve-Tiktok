@@ -5,6 +5,8 @@ class TikTokHandler {
   constructor() {
     this.connection = null;
     this.currentUsername = '';
+    this.lastConnectedUsername = '';
+    this.isManualDisconnect = false;
     this.isConnected = false;
     this.isConnecting = false;
     this.viewerCount = 0;
@@ -42,8 +44,8 @@ class TikTokHandler {
 
   /**
    * Connect to a TikTok channel by username.
-   * When connecting to a new username, automatically resets all old session data
-   * (viewers, coins, gifts, combo streaks) so the new room starts completely fresh.
+   * Only connects when explicitly requested by user.
+   * Automatically resets old session data only when connecting to a DIFFERENT/NEW user.
    */
   async connect(username, options = {}) {
     if (!username || typeof username !== 'string') {
@@ -55,25 +57,33 @@ class TikTokHandler {
       throw new Error('Username TikTok không được để trống');
     }
 
-    const previousUsername = this.currentUsername;
-    const isNewChannel = !previousUsername || previousUsername.toLowerCase() !== cleanUsername.toLowerCase();
-    const shouldReset = !options.isAutoReconnect && (options.resetSession ?? isNewChannel);
+    // Reset manual disconnect flag on explicit connect
+    this.isManualDisconnect = false;
 
-    // Disconnect previous connection if active
+    // Check if connecting to a DIFFERENT user than previous session
+    const previousUsername = this.lastConnectedUsername || this.currentUsername;
+    const isNewUser = Boolean(
+      previousUsername &&
+      previousUsername.toLowerCase() !== cleanUsername.toLowerCase()
+    );
+    const shouldReset = options.resetSession ?? isNewUser;
+
+    // Disconnect previous live connection if active
     if (this.connection) {
       this.disconnect();
+      this.isManualDisconnect = false;
     }
 
-    // If connecting to a new channel/username, reset old viewer & gift data immediately
+    // Only wipe old session data if connecting to a DIFFERENT user
     if (shouldReset) {
-      console.log(`[TikTok] Kết nối kênh mới @${cleanUsername} (kênh trước: ${previousUsername || 'chưa có'}). Đang làm mới dữ liệu khán giả cũ...`);
+      console.log(`[TikTok] Kết nối user mới @${cleanUsername} (user cũ: ${previousUsername}). Đang làm mới dữ liệu live cũ...`);
       this.clearActiveStreaks();
       stateManager.resetSession();
       this.viewerCount = 0;
       this.emitEvent('session_reset', {
         username: cleanUsername,
         previousUsername,
-        reason: 'channel_switch',
+        reason: 'new_user_switch',
         timestamp: Date.now()
       });
     }
@@ -101,6 +111,7 @@ class TikTokHandler {
       this.isConnected = true;
       this.isConnecting = false;
       this.reconnectAttempts = 0;
+      this.lastConnectedUsername = cleanUsername; // Save as last connected user
 
       const initialViewers =
         state?.roomInfo?.user_count ??
@@ -140,41 +151,56 @@ class TikTokHandler {
         message: `Lỗi kết nối: ${err.message}`
       });
 
-      this.scheduleReconnect();
+      // Do NOT auto-reconnect when initial connection fails!
       throw err;
     }
   }
 
+  /**
+   * Disconnect completely from live stream.
+   * Completely stops connection without auto-reconnect loops,
+   * while keeping 100% of player and gift data intact in stateManager.
+   */
   disconnect() {
+    this.isManualDisconnect = true;
+
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+    this.reconnectAttempts = 0;
     this.clearActiveStreaks();
+
     if (this.connection) {
       try {
+        // Strip listeners to prevent 'disconnected' event from triggering reconnect
+        this.connection.removeAllListeners();
         this.connection.disconnect();
       } catch (err) {
         console.warn('[TikTok] Error on disconnect:', err.message);
       }
       this.connection = null;
     }
+
     this.isConnected = false;
     this.isConnecting = false;
     this.viewerCount = 0;
+
     this.emitEvent('viewer_count', {
       viewerCount: 0,
       timestamp: Date.now()
     });
+
     this.emitEvent('tiktok_status', {
       status: 'disconnected',
       isConnected: false,
       isConnecting: false,
       username: this.currentUsername,
       viewerCount: 0,
-      message: 'Đã ngắt kết nối'
+      message: 'Đã dừng kết nối (Dữ liệu đã được lưu giữ)'
     });
-    console.log('[TikTok] Đã ngắt kết nối phiên live.');
+
+    console.log('[TikTok] Đã dừng hẳn kết nối phiên live. Dữ liệu khán giả & quà được bảo toàn.');
   }
 
   scheduleReconnect() {
@@ -242,18 +268,29 @@ class TikTokHandler {
       });
       this.emitEvent('tiktok_status', {
         status: 'ended',
+        isConnected: false,
+        isConnecting: false,
         username: this.currentUsername,
         viewerCount: 0,
-        message: 'Phiên live đã kết thúc'
+        message: 'Phiên live đã kết thúc (Dữ liệu đã được lưu giữ)'
       });
       this.disconnect();
     });
 
     // Disconnected unexpected
     this.connection.on('disconnected', () => {
+      if (this.isManualDisconnect) return;
       console.warn(`[TikTok] Bị mất kết nối với @${this.currentUsername}.`);
       this.isConnected = false;
-      this.scheduleReconnect();
+      this.isConnecting = false;
+      this.emitEvent('tiktok_status', {
+        status: 'disconnected',
+        isConnected: false,
+        isConnecting: false,
+        username: this.currentUsername,
+        viewerCount: 0,
+        message: 'Bị mất kết nối với TikTok'
+      });
     });
 
     // Error

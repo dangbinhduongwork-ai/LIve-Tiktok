@@ -498,10 +498,4 @@ server.listen(PORT, HOST, () => {
   console.log(`Xuat Bao Cao Excel/CSV:     http://localhost:${PORT}/api/gifts/export.csv`);
   console.log(`Trang Thai He Thong:        http://localhost:${PORT}/api/status`);
   console.log('========================================================');
-
-  // Auto connect if TIKTOK_USERNAME is configured in .env
-  if (process.env.TIKTOK_USERNAME) {
-    console.log(`[TikTok] Tự động kết nối tới @${process.env.TIKTOK_USERNAME}...`);
-    tiktokHandler.connect(process.env.TIKTOK_USERNAME).catch(() => {});
-  }
 });

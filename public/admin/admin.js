@@ -227,11 +227,10 @@ btnConnectTikTok.addEventListener('click', () => {
     alert('Vui lòng nhập TikTok username!');
     return;
   }
-  const resetSession = chkAutoResetNewUser ? chkAutoResetNewUser.checked : true;
   btnConnectTikTok.disabled = true;
   btnDisconnectTikTok.disabled = false;
   updateTikTokBadge('connecting', 'Đang kết nối...');
-  socket.emit('admin:tiktok_connect', { username, resetSession });
+  socket.emit('admin:tiktok_connect', { username });
   addLog('status', `[CONNECTING] Đang thiết lập kết nối tới kênh @${username}...`);
 });
 
@@ -239,9 +238,9 @@ btnDisconnectTikTok.addEventListener('click', () => {
   btnDisconnectTikTok.disabled = true;
   btnConnectTikTok.disabled = false;
   socket.emit('admin:tiktok_disconnect');
-  updateTikTokBadge('disconnected', 'Đã ngắt kết nối');
+  updateTikTokBadge('disconnected', 'Đã dừng kết nối (Giữ nguyên dữ liệu)');
   updateViewerCountDisplay(0);
-  addLog('status', '[STOPPED] Đã ngắt kết nối phiên Live.');
+  addLog('status', '[STOPPED] Đã dừng hẳn phiên live. Toàn bộ dữ liệu khán giả và quà tặng được lưu giữ.');
 });
 
 if (btnQuickClearData) {
