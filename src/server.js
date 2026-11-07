@@ -8,33 +8,58 @@ import dotenv from 'dotenv';
 
 import { stateManager } from './stateManager.js';
 import { tiktokHandler } from './tiktokHandler.js';
+import { GameEngine } from './gameEngine.js';
+import { gameConfig } from './gameConfig.js';
+import { createAdminAuth, loadAdminToken } from './adminAuth.js';
+import { GameEventQueue } from './gameEventQueue.js';
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PUBLIC_DIR = path.resolve(__dirname, '../public');
+const PORT = Number(process.env.PORT || 3000);
+// This application is a local OBS/admin server, including with older .env files.
+const HOST = '127.0.0.1';
+const adminTokenFile = path.resolve(__dirname, '../data/admin-token.txt');
+const allowedOrigins = [
+  `http://localhost:${PORT}`, `http://127.0.0.1:${PORT}`,
+  ...String(process.env.ALLOWED_ORIGINS || '').split(',').map(value => value.trim()).filter(Boolean)
+];
+const adminAuth = createAdminAuth({ token: loadAdminToken(adminTokenFile, process.env.ADMIN_TOKEN), allowedOrigins });
 
 const app = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: '*',
+    origin: (origin, callback) => callback(null, adminAuth.originAllowed(origin)),
+    credentials: true,
     methods: ['GET', 'POST']
-  }
+  },
+  allowRequest: (req, callback) => callback(null, adminAuth.originAllowed(req.headers.origin))
 });
-
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
+adminAuth.attachSockets(io);
+const gameEngine = new GameEngine({ config: gameConfig, emit: event => io.emit('game:event', event) });
+const gameQueue = new GameEventQueue(gameConfig.queue);
+let lastQueueWarningAt = -Infinity;
+function resetGame() {
+  gameQueue.clear();
+  gameEngine.reset();
+}
 
 // Auto-traffic simulation handle
 let trafficInterval = null;
 let trafficActive = false;
 
 // Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.static(PUBLIC_DIR));
+app.use(adminAuth.originGuard);
+app.use(cors({ origin: (origin, callback) => callback(null, adminAuth.originAllowed(origin)), credentials: true }));
+app.use(express.json({ limit: '16kb' }));
+app.post('/auth/login', adminAuth.login);
+app.post('/auth/logout', adminAuth.requireAdmin, adminAuth.logout);
+app.use('/login', express.static(path.join(PUBLIC_DIR, 'login')));
+app.use('/admin', adminAuth.requirePage, express.static(path.join(PUBLIC_DIR, 'admin')));
+app.use('/game', express.static(path.join(PUBLIC_DIR, 'game')));
 
 // Routes
 app.get('/', (req, res) => {
@@ -53,7 +78,8 @@ app.get('/api/status', (req, res) => {
     topPlayers: stateManager.getTopPlayers(5),
     tiktok: tiktokHandler.getStatus(),
     trafficActive,
-    giftStats: stateManager.getGiftStats()
+    giftStats: stateManager.getGiftStats(),
+    game: { matchId: gameEngine.matchId, phase: gameEngine.phase, queue: gameQueue.getStats() }
   });
 });
 
@@ -111,11 +137,12 @@ app.get('/api/gifts/export.csv', (req, res) => {
   res.send(csv);
 });
 
-app.post('/api/reset', (req, res) => {
+app.post('/api/reset', adminAuth.requireAdmin, (req, res) => {
   stateManager.resetSession();
+  resetGame();
   io.emit('live:session_reset', { timestamp: Date.now() });
-  io.emit('admin:players_updated', []);
-  io.emit('admin:gift_breakdown_updated', {
+  io.to('admin').emit('admin:players_updated', []);
+  io.to('admin').emit('admin:gift_breakdown_updated', {
     breakdown: [],
     stats: stateManager.getGiftStats(),
     recentTransactions: []
@@ -130,12 +157,23 @@ function broadcastPlayerUpdates() {
   updatePlayersTimeout = setTimeout(() => {
     updatePlayersTimeout = null;
     const allPlayers = stateManager.getAllPlayers();
-    io.emit('admin:players_updated', allPlayers);
+    io.to('admin').emit('admin:players_updated', allPlayers);
   }, 120);
 }
 
 // TikTok Event bridge to Socket.IO & State Manager
 tiktokHandler.setEventCallback((eventName, data) => {
+  // The bridge remains immediate; game work is bounded to one batch per tick.
+  if (['gift_received', 'chat_received', 'like_received', 'viewer_count', 'member_join', 'member_leave'].includes(eventName)) {
+    if (!gameQueue.enqueue(eventName, data, gameEngine.matchId) && Date.now() - lastQueueWarningAt >= gameConfig.queue.warningIntervalMs) {
+      lastQueueWarningAt = Date.now();
+      io.to('admin').emit('admin:event_log', {
+        type: 'status', text: '[GAME] Hàng đợi quá tải; xem bộ đếm dropped trong /api/status. Dữ liệu quà của bridge vẫn được ghi nhận.',
+        time: new Date().toLocaleTimeString('vi-VN')
+      });
+    }
+  } else if (eventName === 'session_reset') resetGame();
+
   switch (eventName) {
     case 'gift_received': {
       const giftUnits = Math.max(1, Math.round((Number(data.deltaCoins) || Number(data.diamondCount) || 1) / (Number(data.diamondCount) || 1)) || 1);
@@ -153,13 +191,13 @@ tiktokHandler.setEventCallback((eventName, data) => {
       });
 
       io.emit('live:gift', data);
-      io.emit('admin:gift_breakdown_updated', {
+      io.to('admin').emit('admin:gift_breakdown_updated', {
         breakdown: stateManager.getGiftBreakdown(),
         stats: stateManager.getGiftStats(),
         recentTransactions: stateManager.getRecentGiftTransactions(30),
         latest: recordedGift?.transaction
       });
-      io.emit('admin:event_log', {
+      io.to('admin').emit('admin:event_log', {
         type: 'gift',
         text: `[QUÀ] ${data.nickname} tặng ${data.giftName} x${data.repeatCount} (+${data.deltaCoins} Xu)`,
         time: new Date().toLocaleTimeString('vi-VN')
@@ -170,7 +208,7 @@ tiktokHandler.setEventCallback((eventName, data) => {
 
     case 'chat_received': {
       io.emit('live:chat', data);
-      io.emit('admin:event_log', {
+      io.to('admin').emit('admin:event_log', {
         type: 'chat',
         text: `[CHAT] ${data.nickname}: ${data.message}`,
         time: new Date().toLocaleTimeString('vi-VN')
@@ -181,7 +219,7 @@ tiktokHandler.setEventCallback((eventName, data) => {
 
     case 'like_received': {
       io.emit('live:like', data);
-      io.emit('admin:event_log', {
+      io.to('admin').emit('admin:event_log', {
         type: 'like',
         text: `[TIM] ${data.nickname} thả ${data.likeCount} tim (Tổng: ${data.totalLikes} tim)`,
         time: new Date().toLocaleTimeString('vi-VN')
@@ -193,7 +231,7 @@ tiktokHandler.setEventCallback((eventName, data) => {
     case 'member_join': {
       io.emit('live:member_join', data);
       if (data.rejoined) {
-        io.emit('admin:event_log', {
+        io.to('admin').emit('admin:event_log', {
           type: 'status',
           text: `[VÀO LẠI] ${data.nickname} đã quay lại phòng live`,
           time: new Date().toLocaleTimeString('vi-VN')
@@ -205,7 +243,7 @@ tiktokHandler.setEventCallback((eventName, data) => {
 
     case 'member_leave': {
       io.emit('live:member_leave', data);
-      io.emit('admin:event_log', {
+      io.to('admin').emit('admin:event_log', {
         type: 'status',
         text: `[OUT PHÒNG] ${data.nickname} đã rời phòng live (-1 khán giả | Giữ nguyên ${data.coins} Xu, ${data.likes} Tim)`,
         time: new Date().toLocaleTimeString('vi-VN')
@@ -221,13 +259,13 @@ tiktokHandler.setEventCallback((eventName, data) => {
 
     case 'session_reset': {
       io.emit('live:session_reset', data);
-      io.emit('admin:players_updated', []);
-      io.emit('admin:gift_breakdown_updated', {
+      io.to('admin').emit('admin:players_updated', []);
+      io.to('admin').emit('admin:gift_breakdown_updated', {
         breakdown: [],
         stats: stateManager.getGiftStats(),
         recentTransactions: []
       });
-      io.emit('admin:event_log', {
+      io.to('admin').emit('admin:event_log', {
         type: 'status',
         text: `[KÊNH MỚI] Đã làm mới toàn bộ dữ liệu khán giả cũ để kết nối phòng live @${data.username}`,
         time: new Date().toLocaleTimeString('vi-VN')
@@ -237,7 +275,7 @@ tiktokHandler.setEventCallback((eventName, data) => {
 
     case 'tiktok_status': {
       io.emit('tiktok_status', data);
-      io.emit('admin:event_log', {
+      io.to('admin').emit('admin:event_log', {
         type: 'status',
         text: `[LIVE] TikTok: ${data.message}`,
         time: new Date().toLocaleTimeString('vi-VN')
@@ -284,10 +322,26 @@ const BOT_GIFTS = [
   { name: 'Vũ Trụ TikTok (Universe)', diamonds: 34999, giftId: '6064' }
 ];
 
+let trafficSeededMatchId = null;
+function seedTrafficPlayers() {
+  if (!trafficActive || trafficSeededMatchId === gameEngine.matchId) return;
+  trafficSeededMatchId = gameEngine.matchId;
+  const favored = gameEngine.matchId % 2 ? 'cr7' : 'm10';
+  const other = favored === 'cr7' ? 'm10' : 'cr7';
+  BOT_NAMES.forEach((nickname, index) => {
+    const userId = `bot_${nickname.toLowerCase().replace(/\s+/g, '_')}`;
+    const team = index % 5 < 3 ? favored : other;
+    gameEngine.handleChat({ userId, nickname, message: gameConfig.teams[team].keywords[0] });
+  });
+}
+
 function startTrafficSimulation() {
   if (trafficInterval) clearInterval(trafficInterval);
   trafficActive = true;
-  io.emit('admin:traffic_status', { active: true });
+  io.to('admin').emit('admin:traffic_status', { active: true });
+
+  // Their normal bridge events then exercise the match without changing admin data.
+  seedTrafficPlayers();
 
   // Simulate initial viewer count if not connected to real live
   if (!tiktokHandler.isConnected) {
@@ -358,7 +412,7 @@ function stopTrafficSimulation() {
     trafficInterval = null;
   }
   trafficActive = false;
-  io.emit('admin:traffic_status', { active: false });
+  io.to('admin').emit('admin:traffic_status', { active: false });
 }
 
 // Socket.IO Communication
@@ -374,7 +428,23 @@ io.on('connection', (socket) => {
     trafficActive,
     giftBreakdown: stateManager.getGiftBreakdown(),
     giftStats: stateManager.getGiftStats(),
-    giftTransactions: stateManager.getRecentGiftTransactions(50)
+    giftTransactions: stateManager.getRecentGiftTransactions(50),
+    game: gameEngine.getState()
+  });
+  socket.emit('game:state', gameEngine.getState());
+
+  socket.on('admin:custom_command', (payload = {}) => {
+    if (!payload || typeof payload !== 'object') return;
+    const action = String(payload.action || '').toUpperCase();
+    let accepted = false;
+    if (action === 'START') accepted = gameEngine.start();
+    else if (action === 'RESET_MATCH') {
+      resetGame();
+      accepted = true;
+    } else if (action === 'FORCE_GOAL') accepted = gameEngine.forceGoal(String(payload.team || '').toLowerCase());
+    if (accepted) {
+      io.emit('game:custom_command', { action, team: payload.team || null });
+    }
   });
 
   // Admin: Connect to TikTok
@@ -464,9 +534,10 @@ io.on('connection', (socket) => {
 
   socket.on('admin:reset_session', () => {
     stateManager.resetSession();
+    resetGame();
     io.emit('live:session_reset', { timestamp: Date.now() });
-    io.emit('admin:players_updated', []);
-    io.emit('admin:gift_breakdown_updated', {
+    io.to('admin').emit('admin:players_updated', []);
+    io.to('admin').emit('admin:gift_breakdown_updated', {
       breakdown: [],
       stats: stateManager.getGiftStats(),
       recentTransactions: []
@@ -475,12 +546,12 @@ io.on('connection', (socket) => {
 
   socket.on('admin:clear_gifts', () => {
     stateManager.clearGifts();
-    io.emit('admin:gift_breakdown_updated', {
+    io.to('admin').emit('admin:gift_breakdown_updated', {
       breakdown: [],
       stats: stateManager.getGiftStats(),
       recentTransactions: []
     });
-    io.emit('admin:event_log', {
+    io.to('admin').emit('admin:event_log', {
       type: 'status',
       text: `[SYS] Streamer đã làm mới toàn bộ bảng kê quà tặng!`,
       time: new Date().toLocaleTimeString('vi-VN')
@@ -488,14 +559,40 @@ io.on('connection', (socket) => {
   });
 });
 
+// The clock is monotonic; a delayed interval advances by actual elapsed time.
+let lastGameTickAt = performance.now();
+let lastGameStateAt = lastGameTickAt;
+setInterval(() => {
+  const now = performance.now();
+  gameQueue.drain(gameEngine.matchId, ({ type, data, receivedAt }) => {
+    if (type === 'chat_received') gameEngine.handleChat(data, receivedAt);
+    else if (type === 'gift_received') gameEngine.handleGift(data, receivedAt);
+    else if (type === 'like_received') gameEngine.handleLike(data, receivedAt);
+    else if (type === 'viewer_count') gameEngine.handleViewerCount(data.viewerCount);
+    else if (type === 'member_join') gameEngine.handleMemberJoin(data, receivedAt);
+    else if (type === 'member_leave') gameEngine.handleMemberLeave(data, receivedAt);
+  });
+  const previousMatchId = gameEngine.matchId;
+  gameEngine.tick((now - lastGameTickAt) / 1000);
+  if (previousMatchId !== gameEngine.matchId) gameQueue.clear();
+  lastGameTickAt = now;
+  seedTrafficPlayers();
+  if (now - lastGameStateAt >= gameConfig.stateIntervalMs) {
+    io.emit('game:state', gameEngine.getState());
+    lastGameStateAt = now;
+  }
+}, gameConfig.tickIntervalMs);
+
 // Start Server
 server.listen(PORT, HOST, () => {
+  const port = server.address().port;
+  allowedOrigins.push(`http://localhost:${port}`, `http://127.0.0.1:${port}`);
   console.log('========================================================');
   console.log('TIKTOK LIVE DATA INGESTION & ADMIN CENTER DA SAN SANG');
-  console.log(`Trang Quan Tri & Tiep Nhan: http://localhost:${PORT}/admin`);
-  console.log(`REST API Khan Gia:          http://localhost:${PORT}/api/players`);
-  console.log(`REST API Bang Ke Qua:       http://localhost:${PORT}/api/gifts`);
-  console.log(`Xuat Bao Cao Excel/CSV:     http://localhost:${PORT}/api/gifts/export.csv`);
-  console.log(`Trang Thai He Thong:        http://localhost:${PORT}/api/status`);
+  console.log(`Trang Quan Tri & Tiep Nhan: http://localhost:${port}/admin`);
+  console.log(`Trang Game:                http://localhost:${port}/game`);
+  console.log(`Trang Thai He Thong:        http://localhost:${port}/api/status`);
+  if (!process.env.ADMIN_TOKEN?.trim()) console.log(`Ma quan tri luu tai:        ${adminTokenFile}`);
   console.log('========================================================');
+  if (process.send) process.send({ type: 'listening', port, host: HOST });
 });

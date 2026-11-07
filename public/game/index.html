@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#091918">
+  <link rel="icon" href="/game/assets/avatar-fallback.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/game/game.css">
+  <title>Đại chiến siêu sao · CR7 vs M10</title>
+  <script type="importmap">{"imports":{"three":"/game/vendor/three/three.module.js","three/addons/":"/game/vendor/three/addons/"}}</script>
+</head>
+<body>
+  <main id="broadcast" aria-label="Trận bóng tương tác trực tiếp">
+    <div class="ambient-lines" aria-hidden="true"></div>
+    <header class="match-header safe-content">
+      <div class="broadcast-kicker"><span class="live-pill"><i></i> LIVE</span><span>ĐẠI CHIẾN SIÊU SAO</span><span id="audience">ĐANG KẾT NỐI</span></div>
+      <div class="scoreboard">
+        <div class="score-team cr7"><div class="shirt-badge" id="shirt-cr7">—</div><div><span class="team-eyebrow">CHỦ SÂN</span><h1 id="name-cr7">—</h1></div><strong id="score-cr7">0</strong></div>
+        <div class="score-divider"><span id="clock">--:--</span><span class="versus">VS</span></div>
+        <div class="score-team m10"><strong id="score-m10">0</strong><div><span class="team-eyebrow">THÁCH ĐẤU</span><h1 id="name-m10">—</h1></div><div class="shirt-badge" id="shirt-m10">—</div></div>
+      </div>
+      <div class="match-meta"><span><i class="status-dot"></i><b id="phase">ĐANG TẢI TRẬN</b></span><span id="match-number">TRẬN 01</span><span id="connection">Đang kết nối…</span></div>
+    </header>
+    <section id="arena" class="safe-content" aria-label="Sân bóng 3D">
+      <div class="arena-kicker"><span>THE LEGENDS ARENA</span><span id="activity">CHỌN ĐỘI · TIẾP LỬA</span></div>
+      <div id="pitch-view"><canvas id="gameCanvas" aria-label="Bóng di chuyển trên sân dọc"></canvas><div id="render-error" hidden>Thiết bị chưa bật WebGL 2. Bảng tỉ số vẫn cập nhật; hãy bật tăng tốc phần cứng để xem sân 3D.</div></div>
+      <div class="goal-tag far"><span id="goal-m10">—</span><i></i></div>
+      <div class="goal-tag near"><i></i><span id="goal-cr7">—</span></div>
+      <div class="side-note"><span>FAN POWER</span><i></i><span>LIVE FOOTBALL</span></div>
+      <aside class="power-meter" aria-label="Lực hai đội và vị trí bóng">
+        <div class="power-label m10"><b id="power-m10">0</b><span id="power-name-m10">—</span></div>
+        <div class="power-track"><div id="power-blue"></div><div id="power-red"></div><i class="power-center"></i><div id="power-ball"><span>◆</span></div></div>
+        <div class="power-label cr7"><b id="power-cr7">0</b><span id="power-name-cr7">—</span></div>
+      </aside>
+      <div id="freeze-m10" class="freeze-badge far" hidden><span class="freeze-ring">❄</span><span>ĐÓNG BĂNG<b>10s</b></span></div>
+      <div id="freeze-cr7" class="freeze-badge near" hidden><span class="freeze-ring">❄</span><span>ĐÓNG BĂNG<b>10s</b></span></div>
+      <div id="phase-banner" class="phase-banner" hidden><span class="banner-kicker"></span><strong></strong><p></p></div>
+      <div id="effect-banner" class="effect-banner" hidden><span class="banner-kicker"></span><strong></strong><p></p></div>
+      <div id="empty-room" hidden><i></i>SÂN ĐANG CHỜ BẠN<span>Chọn đội để nhập cuộc</span></div>
+    </section>
+    <div class="event-ticker safe-content" role="status"><span class="ticker-mark">DIỄN BIẾN</span><span id="latest-event">Đang chờ tín hiệu từ sân…</span></div>
+    <section class="donor-board safe-content" aria-label="Top người tiếp lửa">
+      <div class="donor-title"><span>NHỮNG NGƯỜI TIẾP LỬA</span><span>TOP 3 MỖI ĐỘI <b>✦</b></span></div>
+      <div class="donor-columns"><div class="donor-team cr7"><h2 id="donor-title-cr7">—</h2><ol id="donors-cr7"></ol></div><div class="donor-team m10"><h2 id="donor-title-m10">—</h2><ol id="donors-m10"></ol></div></div>
+    </section>
+    <footer class="join-strip safe-content"><div><span>VÀO ĐỘI CỦA BẠN</span><b>BÌNH LUẬN ĐỂ TIẾP LỬA</b></div><p id="join-guide">Đang tải cú pháp tham gia…</p></footer>
+    <div id="dom-effects" aria-hidden="true"></div>
+    <aside id="debug-panel" hidden></aside>
+  </main>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/game/game.js"></script>
+</body>
+</html>

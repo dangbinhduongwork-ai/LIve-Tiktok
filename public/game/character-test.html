@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kiểm tra nhân vật 3D</title>
+  <link rel="icon" href="/game/assets/avatar-fallback.svg">
+  <script type="importmap">{"imports":{"three":"/game/vendor/three/three.module.js","three/addons/":"/game/vendor/three/addons/"}}</script>
+  <style>body{font:17px/1.6 system-ui,sans-serif;max-width:900px;margin:40px auto;padding:0 24px;background:#0b1c1c;color:#e7eddb}a{color:#b5dbb1}li{padding:9px;border-bottom:1px solid #34554c}.pass{color:#b5e795}.fail{color:#ff9797}code{color:#ddc78b}</style>
+</head>
+<body>
+  <h1>Kiểm tra nhân vật 3D</h1>
+  <p>Kiểm tra tự động bằng model mẫu tự tạo. Không kết nối hoặc điều khiển trận đang chạy.</p>
+  <p id="summary">Đang kiểm tra…</p><ol id="results"></ol>
+  <p>Thông báo 404 cho <code>missing-model.glb</code> và <code>missing-clip.fbx</code> là tình huống kiểm tra có chủ ý.</p>
+  <p><a href="/game/?debug">Mở game với chẩn đoán</a> · <a href="/game/assets/characters/README.md">Hướng dẫn thay model</a></p>
+  <script type="module" src="/game/tests/character-tests.js"></script>
+</body>
+</html>

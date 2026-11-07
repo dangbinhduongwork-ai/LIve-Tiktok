@@ -1,0 +1,34 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; FBX 7.4.0 project-owned QA fixture
+FBXHeaderExtension: {
+	FBXHeaderVersion: 1003
+	FBXVersion: 7400
+}
+Objects: {
+	Model: 102, "Model::FixtureRoot", "Null" {
+		Properties70: {
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-2,0
+		}
+	}
+	AnimationStack: 200, "AnimStack::Breathing Idle", "" {
+	}
+	AnimationLayer: 201, "AnimLayer::BaseLayer", "" {
+	}
+	AnimationCurveNode: 202, "AnimCurveNode::T", "" {
+	}
+	AnimationCurve: 203, "AnimCurve::Y", "" {
+		KeyTime: *3 {
+			a: 0,23093079000,46186158000
+		}
+		KeyValueFloat: *3 {
+			a: -2,-1.9,-2
+		}
+	}
+}
+Connections: {
+	C: "OO",102,0
+	C: "OO",201,200
+	C: "OO",202,201
+	C: "OP",202,102,"Lcl Translation"
+	C: "OP",203,202,"d|Y"
+}

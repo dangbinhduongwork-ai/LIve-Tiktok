@@ -137,6 +137,7 @@
         </div>
       </div>
       <div class="header-actions">
+        <button id="btnLogout" class="btn btn-secondary">Đăng xuất</button>
         <button id="btnHeaderRefresh" class="btn btn-secondary">
           <svg class="svg-icon"><use href="#icon-refresh"/></svg>
           <span>Làm Mới Dữ Liệu</span>
@@ -151,6 +152,16 @@
         </button>
       </div>
     </header>
+
+    <section class="game-controls" aria-label="Điều khiển trận đấu">
+      <strong>CR7 vs M10</strong>
+      <span id="gameMatchStatus" aria-live="polite">Đang tải trận đấu…</span>
+      <a href="/game/" target="_blank" class="btn btn-secondary">Mở game</a>
+      <button class="btn btn-accent" data-game-action="START">Bắt đầu ngay</button>
+      <button class="btn btn-secondary" data-game-action="FORCE_GOAL" data-team="cr7">CR7 + bàn</button>
+      <button class="btn btn-secondary" data-game-action="FORCE_GOAL" data-team="m10">M10 + bàn</button>
+      <button class="btn btn-danger" data-game-action="RESET_MATCH">Reset trận</button>
+    </section>
 
     <!-- METRICS OVERVIEW BAR (6 CARDS INCLUDING LIVE VIEWER COUNT) -->
     <div class="metrics-bar">

@@ -1,0 +1,316 @@
+{
+  "checkedAt": "2026-11-07T03:47:04.384Z",
+  "browser": "156.0.8078.80",
+  "characterTests": {
+    "done": true,
+    "results": [
+      {
+        "name": "Alias không phân biệt hoa thường, khớp chuỗi con",
+        "passed": true
+      },
+      {
+        "name": "Thiếu clip dùng run/idle; không clip vẫn hợp lệ",
+        "passed": true
+      },
+      {
+        "name": "Đường dẫn chỉ dùng tài nguyên cục bộ, có bỏ cache",
+        "passed": true
+      },
+      {
+        "name": "Texture FBX trỏ về file local, giữ đường dẫn ghi đè",
+        "passed": true
+      },
+      {
+        "name": "Chuẩn hóa tên xương, lệch đơn vị cm/m và root motion",
+        "passed": true
+      },
+      {
+        "name": "Nạp GLB, chiều cao 1,8, chạm đất và animation không phá scale",
+        "passed": true
+      },
+      {
+        "name": "Nạp GLTF, chiều cao 1,8, chạm đất và animation không phá scale",
+        "passed": true
+      },
+      {
+        "name": "Nạp FBX, chiều cao 1,8, chạm đất và animation không phá scale",
+        "passed": true
+      },
+      {
+        "name": "GLB có xương: đo 24 mẫu và chân chạm đất",
+        "passed": true
+      },
+      {
+        "name": "FBX clip riêng không mesh, ghép vào model GLB",
+        "passed": true
+      },
+      {
+        "name": "Clip một lần quay về idle/run và có thể phát lại",
+        "passed": true
+      },
+      {
+        "name": "Thiếu file model dùng cầu thủ tạm và cảnh báo",
+        "passed": true
+      },
+      {
+        "name": "Thiếu clip riêng giữ model và clip gần nhất",
+        "passed": true
+      },
+      {
+        "name": "Cấu hình trống trả cùng giao diện và dispose an toàn",
+        "passed": true
+      },
+      {
+        "name": "Dừng trong lúc tải không gắn model đã huỷ lên sân",
+        "passed": true
+      }
+    ],
+    "warnings": [
+      "cr7: Không nạp được tài nguyên missing-model.glb; kiểm tra file/texture cục bộ.",
+      "cr7: Không nạp được tài nguyên missing-model.glb; kiểm tra file/texture cục bộ.",
+      "cr7: Dùng nhân vật tạm: fetch for \"http://127.0.0.1:51843/game/assets/characters/fixtures/missing-model.glb\" responded with 404: Not Found",
+      "cr7: Không nạp được tài nguyên missing-clip.fbx; kiểm tra file/texture cục bộ.",
+      "cr7: Clip kick lỗi (fetch for \"http://127.0.0.1:51843/game/assets/characters/fixtures/missing-clip.fbx\" responded with 404: Not Found); dùng clip gần nhất."
+    ],
+    "passed": 15,
+    "total": 15
+  },
+  "liveQA": {
+    "beforeReload": {
+      "matchId": 3,
+      "score": {
+        "cr7": 0,
+        "m10": 0
+      }
+    },
+    "afterReload": {
+      "matchId": 3,
+      "score": {
+        "cr7": 0,
+        "m10": 0
+      }
+    },
+    "offline": {
+      "renderer": true,
+      "guide": "Gõ 7 CR7·Gõ 10 M10"
+    },
+    "reconnected": true,
+    "phases": [
+      {
+        "phase": "PLAYING",
+        "matchId": 1,
+        "active": 15,
+        "at": "2026-11-07T03:37:57.987Z"
+      },
+      {
+        "phase": "WAITING",
+        "matchId": 2,
+        "active": 15,
+        "at": "2026-11-07T03:37:58.098Z"
+      },
+      {
+        "phase": "PLAYING",
+        "matchId": 2,
+        "active": 15,
+        "at": "2026-11-07T03:38:03.101Z"
+      },
+      {
+        "phase": "OVERTIME",
+        "matchId": 2,
+        "active": 12,
+        "at": "2026-11-07T03:40:33.060Z"
+      },
+      {
+        "phase": "RESULT",
+        "matchId": 2,
+        "active": 12,
+        "at": "2026-11-07T03:41:03.073Z"
+      },
+      {
+        "phase": "WAITING",
+        "matchId": 3,
+        "active": 15,
+        "at": "2026-11-07T03:41:18.099Z"
+      },
+      {
+        "phase": "PLAYING",
+        "matchId": 3,
+        "active": 14,
+        "at": "2026-11-07T03:41:23.065Z"
+      }
+    ],
+    "eventCounts": {
+      "team_join": 30,
+      "gift_skill": 7,
+      "freeze": 2,
+      "goal": 1,
+      "overtime": 1,
+      "result": 1,
+      "gift_rejected": 3
+    },
+    "errors": []
+  },
+  "robustnessQA": {
+    "avatarFallback": "/game/assets/avatar-fallback.svg",
+    "keywordQA": "Gõ đỏ CR7·Gõ xanh M10",
+    "rankQA": {
+      "top": "Bảo Ngọc",
+      "animated": true
+    },
+    "safeQA": true,
+    "recoveryQA": {
+      "renderer": true,
+      "characters": [
+        "cr7",
+        "m10"
+      ]
+    }
+  },
+  "fpsResults": [
+    {
+      "fps": 60,
+      "averageFps": 59.9502404931079,
+      "p95FrameMs": 16.899999618530273,
+      "samples": 600,
+      "quality": "normal",
+      "pixelRatio": 1,
+      "drawCalls": 126,
+      "triangles": 10834,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 730 (0x00004682) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "connected": false,
+      "renderer": true,
+      "characters": {
+        "cr7": {
+          "kind": "placeholder",
+          "source": "placeholder"
+        },
+        "m10": {
+          "kind": "placeholder",
+          "source": "placeholder"
+        }
+      },
+      "warnings": []
+    },
+    {
+      "fps": 60,
+      "averageFps": 59.91617638366387,
+      "p95FrameMs": 16.799999237060547,
+      "samples": 599,
+      "quality": "low",
+      "pixelRatio": 1,
+      "drawCalls": 79,
+      "triangles": 5050,
+      "gpu": "ANGLE (Intel, Intel(R) UHD Graphics 730 (0x00004682) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "connected": false,
+      "renderer": true,
+      "characters": {
+        "cr7": {
+          "kind": "placeholder",
+          "source": "placeholder"
+        },
+        "m10": {
+          "kind": "placeholder",
+          "source": "placeholder"
+        }
+      },
+      "warnings": []
+    }
+  ],
+  "screenshots": [
+    {
+      "scene": "waiting",
+      "guide": true,
+      "renderer": true
+    },
+    {
+      "scene": "playing",
+      "guide": true,
+      "renderer": true
+    },
+    {
+      "scene": "goal",
+      "guide": true,
+      "renderer": true
+    },
+    {
+      "scene": "overtime",
+      "guide": true,
+      "renderer": true
+    },
+    {
+      "scene": "freeze",
+      "guide": true,
+      "renderer": true
+    },
+    {
+      "scene": "golden",
+      "guide": true,
+      "renderer": true
+    },
+    {
+      "scene": "result",
+      "guide": true,
+      "renderer": true
+    },
+    {
+      "scene": "empty",
+      "guide": true,
+      "renderer": true
+    }
+  ],
+  "modelIntegration": {
+    "configurationOverrideInTestBrowser": true,
+    "modelIntegration": {
+      "cr7": {
+        "kind": "model",
+        "source": "fixtures/rig.glb",
+        "fit": {
+          "method": "bones",
+          "samples": 24,
+          "sourceHeight": 2.049999952316284,
+          "scale": 0.8780488009115266,
+          "height": 1.8,
+          "groundY": 0
+        },
+        "clips": {
+          "idle": "Breathing Idle",
+          "run": "Run",
+          "kick": "Soccer Kick",
+          "celebrate": "Victory",
+          "defeated": "Breathing Idle",
+          "jump": "Victory"
+        }
+      },
+      "m10": {
+        "kind": "model",
+        "source": "fixtures/sample.fbx",
+        "fit": {
+          "method": "mesh",
+          "samples": 0,
+          "sourceHeight": 2,
+          "scale": 0.9,
+          "height": 1.8,
+          "groundY": 0
+        },
+        "clips": {
+          "kick": "Breathing Idle",
+          "idle": "Breathing Idle",
+          "run": "Breathing Idle",
+          "celebrate": "Breathing Idle",
+          "defeated": "Breathing Idle",
+          "jump": "Breathing Idle"
+        }
+      }
+    },
+    "restoredDefaults": {
+      "cr7": {
+        "kind": "placeholder",
+        "source": "placeholder"
+      },
+      "m10": {
+        "kind": "placeholder",
+        "source": "placeholder"
+      }
+    }
+  }
+}

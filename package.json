@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node tests/smokeTest.js"
+    "test": "node tests/runSmokeTest.js && node --test tests/gameEngine.test.js tests/gameEventQueue.test.js tests/server.test.js"
   },
   "keywords": [
     "tiktok-live",

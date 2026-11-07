@@ -1,5 +1,15 @@
 # TIKTOK LIVE DATA CONTROLLER & GAME INTEGRATION HUB
 
+## Bản CR7 vs M10 hiện tại (07/11/2026)
+
+- Game ở `/game`: chờ 5s → thi đấu 150s → bù giờ cố định 30s (bàn thắng ×2) → kết quả 15s → trận mới. Đóng băng kéo dài 10s, lực đối thủ ×0,3.
+- Cấu hình luật: `src/gameConfig.js`; logic server: `src/gameEngine.js`; hàng đợi: `src/gameEventQueue.js`.
+- `npm start` bind cố định `127.0.0.1`. Mở `/admin` và đăng nhập bằng `ADMIN_TOKEN`, hoặc mã tự sinh trong `data/admin-token.txt`. File mã nằm trong thư mục dữ liệu đã bị Git bỏ qua. Cấu hình `HOST` cũ trong `.env` không mở server ra LAN.
+- Cookie quản trị có hạn 12 giờ, HttpOnly/SameSite=Strict. `/game` và API đọc không yêu cầu đăng nhập; `POST /api/reset` và mọi lệnh socket `admin:*` yêu cầu quyền quản trị. Có nút điều khiển trận trên admin.
+- `npm test` chạy smoke test và server kiểm thử trong `.test-workspaces/`, tự dọn sau khi xong; không ghi vào phiên live thật trong `data/session.json`.
+- Queue xử lý tối đa 100 sự kiện/tick, 4096 sự kiện chờ, dự phòng 512 chỗ cho quà. Nếu đầy, admin nhận cảnh báo và `/api/status.game.queue` tăng `dropped`/`droppedGifts`; bridge vẫn ghi quà nhưng game không áp dụng sự kiện bị từ chối.
+- Xem [brief cập nhật](BRIEF-live-tiktok-game-engine.md) và [tiến độ theo quy trình](QUYTRINH-live-bong-da-cr7-vs-m10.md). Model 3D, âm thanh và thử live thật là các bước tiếp theo.
+
 > **Tài liệu Kỹ thuật & Hướng dẫn Tích hợp Game (Dành cho Developer & AI IDE / Coding Agents)**  
 > Dự án này là **Hệ thống Tiếp nhận Dữ liệu TikTok Live Thời gian thực & Trung tâm Quản trị Streamer (`/admin`)** được thiết kế tách biệt hoàn toàn khỏi logic game. Bạn (hoặc bất kỳ AI IDE nào) có thể gắn bất kỳ con game nào vào hệ thống này chỉ bằng cách lắng nghe các sự kiện Socket.IO hoặc gọi REST API có sẵn.
 
@@ -40,7 +50,7 @@ Hệ thống hoạt động theo mô hình **Event-Driven Bridge (Cầu nối s�
 ## 2. Cấu trúc Thư mục Dự án
 
 ```text
-E:\Live tiktok
+LIve-Tiktok/
 ├── data/
 │   └── session.json          # Tự động lưu danh sách người xem, xu, tim, bảng kê quà
 ├── public/                   # Thư mục tĩnh được Express phục vụ tự động tại gốc "/"
@@ -48,14 +58,22 @@ E:\Live tiktok
 │   │   ├── index.html
 │   │   ├── admin.css
 │   │   └── admin.js
-│   ├── game/                 # <--- ĐẶT CODE GAME CỦA BẠN VÀO ĐÂY (Truy cập tại /game)
-│   └── game-template/        # Thư mục mẫu dự phòng (nếu cần)
+│   ├── game/                 # Canvas CR7 vs M10 (truy cập tại /game)
+│   └── login/                # Trang đăng nhập quản trị
 ├── src/
 │   ├── server.js             # Server Express + Socket.IO + REST APIs (Cổng mặc định: 3000)
 │   ├── tiktokHandler.js      # Kết nối TikTok Live Webcast & xử lý sự kiện gốc
-│   └── stateManager.js       # Quản lý trạng thái người chơi, bảng xếp hạng & kho quà
+│   ├── stateManager.js       # Quản lý trạng thái người chơi, bảng xếp hạng & kho quà
+│   ├── gameConfig.js         # Luật và các giới hạn game
+│   ├── gameEngine.js         # Logic trận đấu phía server
+│   ├── gameEventQueue.js     # Hàng đợi tương tác có trần
+│   └── adminAuth.js          # Token, phiên đăng nhập và bảo vệ socket admin
 ├── tests/
-│   └── smokeTest.js          # Bộ kiểm thử tự động (chạy bằng lệnh: npm test)
+│   ├── smokeTest.js          # Bộ kiểm thử bridge cũ
+│   ├── runSmokeTest.js       # Chạy smoke test trong workspace tạm
+│   ├── gameEngine.test.js    # Luật trận
+│   ├── gameEventQueue.test.js # Hàng đợi và giới hạn tải
+│   └── server.test.js        # Xác thực và tích hợp server thật
 ├── .env.example              # Mẫu cấu hình biến môi trường
 ├── package.json              # Khai báo dependencies
 └── README.md                 # Tài liệu hướng dẫn này
@@ -89,7 +107,7 @@ Vì `src/server.js` đã cấu hình `app.use(express.static(PUBLIC_DIR))`, mọ
 
 ### Cách 2: Kết nối từ Game chạy độc lập bên ngoài (Unity C#, Godot, Cocos, Python/Pygame, hoặc React/Vite chạy cổng khác)
 
-Server đã bật sẵn CORS (`origin: '*'`) cho cả Express và Socket.IO. Nếu game của bạn chạy ở một phần mềm khác hoặc cổng khác (ví dụ `http://localhost:5173`):
+Server cho phép origin local của chính ứng dụng. Nếu game web chạy cổng khác (ví dụ `http://localhost:5173`), thêm origin đó vào `ALLOWED_ORIGINS` trong môi trường chạy. Nếu game chạy ở một phần mềm khác hoặc cổng khác:
 1. Kết nối Socket.IO Client tới URL: `http://localhost:3000`
    ```javascript
    import { io } from "socket.io-client";
@@ -285,7 +303,10 @@ socket.on('live:session_reset', (data) => {
 ---
 
 ### 4.8. Sự kiện `admin:players_updated` (Cập nhật danh sách toàn bộ người chơi)
-Phát ra mỗi khi danh sách người chơi có thay đổi (sau khi donate, chat, thả tim, hoặc khi Streamer cộng `+10 Xu` / xóa người chơi trên bảng Admin).
+
+Sự kiện này hiện chỉ gửi tới socket quản trị đã xác thực. Game CR7 vs M10 dùng `game:state` để cập nhật đội, lực, bóng và bảng donate; `init_state.game` giúp đồng bộ lại khi tải trang.
+
+Phát tới quản trị viên mỗi khi danh sách người chơi có thay đổi (sau khi donate, chat, thả tim, hoặc khi Streamer cộng `+10 Xu` / xóa người chơi trên bảng Admin).
 ```javascript
 socket.on('admin:players_updated', (allPlayers) => {
   // allPlayers là mảng các Player đã sắp xếp giảm dần theo số coins
@@ -293,6 +314,13 @@ socket.on('admin:players_updated', (allPlayers) => {
 ```
 
 ---
+
+### 4.9. Trạng thái và sự kiện game CR7 vs M10
+
+- `game:state`: phát tối đa 10 lần/giây, gồm `matchId`, `phase`, `timeLeft`, `score`, `ballPos`, `fieldLimit`, `forces`, `teams`, `viewerCount`, `goalPauseLeft`, `smallBalls`, `result`.
+- Mỗi đội có tên/màu/số áo, `count`, `top3`, `likeBoost`, `frozen`, `freezeLeft`. `result` giữ đội thắng (hoặc `null` nếu hòa) và tỉ số để F5 ở màn kết quả vẫn đồng bộ.
+- `game:event`: `team_join`, `gift_skill`, `freeze`, `goal`, `overtime`, `result`. Game hiển thị từ các payload này; luật chạy trong `src/gameEngine.js`.
+- `init_state.game`: snapshot trận hiện tại khi kết nối/kết nối lại.
 
 ## 5. Cơ chế Hoạt động của Bộ Giả lập Admin (`/admin`)
 
@@ -306,7 +334,8 @@ Khi phát triển hoặc kiểm thử game, bạn **không cần phải phát tr
    - Nhập tên người xem, User ID, nội dung bình luận và bấm **Gửi** -> Game sẽ nhận ngay sự kiện `live:chat`.
    - Bấm các nút `+1`, `+5`, `+20`, `+50`, `+100` tim -> Game sẽ nhận ngay sự kiện `live:like`.
 3. **Chế độ Auto Traffic (15 Bots tự động):**
-   - Khi bấm **Bật Test Tải**, Server sẽ tự động sinh 15 bot liên tục thả tim (55%), bình luận (30%) và tặng quà TikTok thật (15%) mỗi 2 giây, đồng thời mô phỏng số mắt xem (`live:viewer_count`). Dùng để kiểm tra hiệu năng FPS và độ mượt của Game khi phòng live đông người.
+   - Khi bấm **Bật Test Tải**, mỗi 2 giây server chọn một trong 15 bot: 50% thả tim, 28% bình luận, 12% giả lập quà và 10% mô phỏng rời phòng (hoặc thả tim nếu chưa đủ người). Số mắt xem cũng được mô phỏng. Quà là dữ liệu giả lập, không có giao dịch TikTok thật.
+   - Riêng game gán bot theo hai đội 9/6, luân phiên phe đông hơn và gán lại ở trận mới. Đây là thiết lập kiểm thử; người xem thật chọn đội bằng comment.
 4. **Quản lý Khán giả Trực tiếp:**
    - Trong tab **Khán Giả Tương Tác**, khi bạn bấm nút **`+10 Xu`** hoặc **`Xóa`** một người chơi, Server sẽ cập nhật ngay vào `stateManager` và phát sự kiện `admin:players_updated` xuống cho cả Admin lẫn Game.
 
@@ -314,15 +343,20 @@ Khi phát triển hoặc kiểm thử game, bạn **không cần phải phát tr
 
 ## 6. Đặc tả REST APIs
 
-Ngoài Socket.IO, Server cung cấp sẵn 5 cổng HTTP REST API chuẩn JSON/CSV:
+Ngoài Socket.IO, Server cung cấp 6 endpoint dữ liệu/điều khiển JSON/CSV:
 
 | Phương thức | Endpoint | Mô tả chi tiết |
 | :--- | :--- | :--- |
 | `GET` | `/api/status` | Trả về trạng thái server, `uptime`, `viewerCount` (số mắt xem), `playerCount`, `topPlayers` (Top 5), trạng thái kết nối TikTok và tổng quan quà tặng (`giftStats`). |
 | `GET` | `/api/players` | Trả về `{ total, players: [...] }` chứa toàn bộ khán giả đã tương tác, sắp xếp giảm dần theo `coins` và `likes`. |
+| `GET` | `/api/players/export.csv` | Xuất bảng xếp hạng khán giả ra CSV. |
 | `GET` | `/api/gifts` | Trả về `{ stats, breakdown, recentTransactions }` thống kê chi tiết từng loại quà, tỷ trọng % doanh thu, người tặng nhiều nhất (`topDonor`) của từng món quà và 100 giao dịch gần nhất. |
 | `GET` | `/api/gifts/export.csv` | Xuất báo cáo tài chính quà tặng ra file `.csv` (chuẩn UTF-8 BOM mở trực tiếp bằng Microsoft Excel không lỗi font tiếng Việt). |
 | `POST` | `/api/reset` | Xóa trắng toàn bộ dữ liệu người chơi và quà tặng của phiên hiện tại, đồng thời phát sự kiện `live:session_reset`. |
+
+`POST /api/reset` cần cookie đăng nhập hoặc header `Authorization: Bearer <ADMIN_TOKEN>` và trả HTTP 401 khi thiếu quyền. `POST /auth/login` nhận JSON `{ "token": "..." }`; `POST /auth/logout` thu hồi phiên. Không truyền token trong URL.
+
+Socket từ công cụ quản trị ngoài kết nối bằng `io(url, { auth: { role: 'admin', token: adminToken } })`. Trang `/admin` dùng cookie tự động, còn game chỉ cần `io()`. Các sự kiện `admin:*` từ socket không có quyền đều bị từ chối.
 
 ---
 
@@ -509,7 +543,7 @@ Nếu bạn đang là một **AI Coding Assistant (Cursor, Windsurf, GitHub Copi
 
 1. **KHÔNG ĐƯỢC phá vỡ hoặc xóa các file hệ thống lõi:**
    - Giữ nguyên `src/tiktokHandler.js`, `src/stateManager.js`, và các endpoint/socket event hiện có trong `src/server.js`.
-   - Giữ nguyên giao diện quản trị trong `public/admin/`.
+   - Khi gắn game mới, giữ cơ chế đăng nhập và kiểm tra quyền quản trị trong `src/adminAuth.js`, `src/server.js` và `public/admin/`.
 2. **Vị trí đặt code Game mới:**
    - Đặt toàn bộ mã nguồn giao diện của game trong thư mục `public/game/` (bắt đầu từ `public/game/index.html`).
    - Nếu game cần lưu trạng thái riêng ở phía server, hãy viết thành module riêng (ví dụ `src/gameEngine.js`) và import vào `src/server.js`.
@@ -532,7 +566,7 @@ npm install
 # 2. Khởi chạy Server (Mặc định tại cổng 3000)
 npm start
 
-# 3. Chạy bộ kiểm thử tự động (7/7 bài test hệ thống tiếp nhận dữ liệu)
+# 3. Chạy smoke test, test luật trận, hàng đợi và xác thực server
 npm test
 ```
 

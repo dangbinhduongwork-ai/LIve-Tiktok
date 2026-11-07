@@ -5,7 +5,35 @@
  * Trung tâm tiếp nhận và quản trị toàn diện dữ liệu Live Stream TikTok.
  */
 
-const socket = io();
+const socket = io({ auth: { role: 'admin' } });
+socket.on('connect_error', error => {
+  if (error.message === 'ADMIN_AUTH_REQUIRED') location.replace('/login/');
+});
+socket.on('disconnect', reason => {
+  if (reason === 'io server disconnect') location.replace('/login/');
+});
+socket.on('admin:error', error => {
+  if (error.code === 'ADMIN_AUTH_REQUIRED') location.replace('/login/');
+});
+
+document.getElementById('btnLogout').addEventListener('click', async () => {
+  await fetch('/auth/logout', { method: 'POST' });
+  location.replace('/login/');
+});
+document.querySelectorAll('[data-game-action]').forEach(button => {
+  button.addEventListener('click', () => {
+    if (button.dataset.gameAction === 'RESET_MATCH' && !confirm('Bắt đầu lại trận đấu và xóa điểm của trận hiện tại?')) return;
+    socket.emit('admin:custom_command', { action: button.dataset.gameAction, team: button.dataset.team });
+  });
+});
+socket.on('game:state', state => {
+  const phases = { WAITING: 'Chờ', PLAYING: 'Đang đá', OVERTIME: 'Bù giờ ×2', RESULT: 'Kết quả' };
+  document.getElementById('gameMatchStatus').textContent = `${phases[state.phase]} · ${state.score.cr7} – ${state.score.m10} · ${state.timeLeft}s`;
+  document.querySelector('[data-game-action="START"]').disabled = state.phase !== 'WAITING';
+  document.querySelectorAll('[data-game-action="FORCE_GOAL"]').forEach(button => {
+    button.disabled = !['PLAYING', 'OVERTIME'].includes(state.phase);
+  });
+});
 
 // DOM Elements: Header & Status
 const statTiktokStatus = document.getElementById('statTiktokStatus');

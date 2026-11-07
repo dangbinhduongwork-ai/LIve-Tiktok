@@ -1,0 +1,46 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; FBX 7.4.0 project-owned QA fixture
+FBXHeaderExtension: {
+	FBXHeaderVersion: 1003
+	FBXVersion: 7400
+}
+Objects: {
+	Geometry: 100, "Geometry::Body", "Mesh" {
+		Vertices: *24 {
+			a: -0.3,0,-0.2,0.3,0,-0.2,0.3,2,-0.2,-0.3,2,-0.2,-0.3,0,0.2,0.3,0,0.2,0.3,2,0.2,-0.3,2,0.2
+		}
+		PolygonVertexIndex: *36 {
+			a: 0,2,-2,0,3,-3,4,5,-7,4,6,-8,0,1,-6,0,5,-5,3,7,-7,3,6,-3,1,2,-7,1,6,-6,0,4,-8,0,7,-4
+		}
+	}
+	Model: 101, "Model::Body", "Mesh" {
+	}
+	Model: 102, "Model::FixtureRoot", "Null" {
+		Properties70: {
+			P: "Lcl Translation", "Lcl Translation", "", "A",0,-2,0
+		}
+	}
+	AnimationStack: 200, "AnimStack::Breathing Idle", "" {
+	}
+	AnimationLayer: 201, "AnimLayer::BaseLayer", "" {
+	}
+	AnimationCurveNode: 202, "AnimCurveNode::T", "" {
+	}
+	AnimationCurve: 203, "AnimCurve::Y", "" {
+		KeyTime: *3 {
+			a: 0,23093079000,46186158000
+		}
+		KeyValueFloat: *3 {
+			a: -2,-1.9,-2
+		}
+	}
+}
+Connections: {
+	C: "OO",100,101
+	C: "OO",101,102
+	C: "OO",102,0
+	C: "OO",201,200
+	C: "OO",202,201
+	C: "OP",202,102,"Lcl Translation"
+	C: "OP",203,202,"d|Y"
+}

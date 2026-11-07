@@ -1,8 +1,25 @@
-node_modules/
+# Dependencies
+/node_modules/
+
+# Local environment files
 .env
-.env.local
-data/session.json
+.env.*
+!.env.example
+
+# Runtime session data
+/data/
+
+# Isolated test runs (never use the real live session data)
+/.test-workspaces/
+
+# Logs
 *.log
+*.log.*
+
+# Editor and OS files
+.idea/
+*.swp
+*.swo
 .DS_Store
 Thumbs.db
 
