@@ -142,13 +142,21 @@ class TikTokHandler {
       this.isConnecting = false;
       console.error(`[TikTok] Lỗi kết nối tới @${this.currentUsername}:`, err.message);
 
+      let friendlyMsg = err.message || 'Lỗi kết nối không xác định';
+      if (friendlyMsg.includes('rate_limit') || friendlyMsg.includes('Rate Limited') || friendlyMsg.includes('eulerstream')) {
+        friendlyMsg = 'Đã đạt giới hạn kết nối trong 1 giờ (Rate Limit EulerStream). Vui lòng đợi ít phút hoặc thêm SIGN_API_KEY miễn phí từ eulerstream.com vào file .env';
+      } else if (friendlyMsg.includes('Failed to retrieve Room ID') || friendlyMsg.includes("isn't online")) {
+        friendlyMsg = `Không tìm thấy phòng live của @${this.currentUsername} (Có thể kênh chưa phát trực tiếp)`;
+      }
+
       this.emitEvent('tiktok_status', {
         status: 'error',
         isConnected: false,
         isConnecting: false,
         username: this.currentUsername,
         viewerCount: this.viewerCount,
-        message: `Lỗi kết nối: ${err.message}`
+        message: friendlyMsg,
+        rawError: err.message
       });
 
       // Do NOT auto-reconnect when initial connection fails!
