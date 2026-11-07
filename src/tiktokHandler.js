@@ -102,7 +102,8 @@ class TikTokHandler {
     try {
       this.connection = new TikTokLiveConnection(this.currentUsername, {
         processInitialData: false,
-        enableExtendedGiftInfo: false
+        enableExtendedGiftInfo: false,
+        signApiKey: process.env.SIGN_API_KEY || undefined
       });
 
       this.setupListeners();
