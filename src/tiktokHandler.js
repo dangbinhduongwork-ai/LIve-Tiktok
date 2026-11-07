@@ -82,6 +82,8 @@ class TikTokHandler {
     this.isConnecting = true;
     this.emitEvent('tiktok_status', {
       status: 'connecting',
+      isConnected: false,
+      isConnecting: true,
       username: this.currentUsername,
       viewerCount: this.viewerCount,
       message: `Đang kết nối tới @${this.currentUsername}...`
@@ -115,6 +117,8 @@ class TikTokHandler {
       console.log(`[TikTok] Kết nối thành công tới phòng live của @${this.currentUsername} (RoomId: ${state.roomId})`);
       this.emitEvent('tiktok_status', {
         status: 'connected',
+        isConnected: true,
+        isConnecting: false,
         username: this.currentUsername,
         roomId: state.roomId,
         viewerCount: this.viewerCount,
@@ -129,6 +133,8 @@ class TikTokHandler {
 
       this.emitEvent('tiktok_status', {
         status: 'error',
+        isConnected: false,
+        isConnecting: false,
         username: this.currentUsername,
         viewerCount: this.viewerCount,
         message: `Lỗi kết nối: ${err.message}`
@@ -162,6 +168,8 @@ class TikTokHandler {
     });
     this.emitEvent('tiktok_status', {
       status: 'disconnected',
+      isConnected: false,
+      isConnecting: false,
       username: this.currentUsername,
       viewerCount: 0,
       message: 'Đã ngắt kết nối'
@@ -178,6 +186,8 @@ class TikTokHandler {
 
     this.emitEvent('tiktok_status', {
       status: 'reconnecting',
+      isConnected: false,
+      isConnecting: true,
       username: this.currentUsername,
       attempt: this.reconnectAttempts,
       viewerCount: this.viewerCount,
@@ -484,6 +494,7 @@ class TikTokHandler {
 
   getStatus() {
     return {
+      status: this.isConnected ? 'connected' : (this.isConnecting ? 'connecting' : 'disconnected'),
       isConnected: this.isConnected,
       isConnecting: this.isConnecting,
       username: this.currentUsername,

@@ -229,6 +229,7 @@ btnConnectTikTok.addEventListener('click', () => {
   }
   const resetSession = chkAutoResetNewUser ? chkAutoResetNewUser.checked : true;
   btnConnectTikTok.disabled = true;
+  btnDisconnectTikTok.disabled = false;
   updateTikTokBadge('connecting', 'Đang kết nối...');
   socket.emit('admin:tiktok_connect', { username, resetSession });
   addLog('status', `[CONNECTING] Đang thiết lập kết nối tới kênh @${username}...`);
@@ -236,6 +237,7 @@ btnConnectTikTok.addEventListener('click', () => {
 
 btnDisconnectTikTok.addEventListener('click', () => {
   btnDisconnectTikTok.disabled = true;
+  btnConnectTikTok.disabled = false;
   socket.emit('admin:tiktok_disconnect');
   updateTikTokBadge('disconnected', 'Đã ngắt kết nối');
   updateViewerCountDisplay(0);
@@ -251,16 +253,23 @@ if (btnQuickClearData) {
 }
 
 function handleTikTokStatusUpdate(data) {
+  if (!data) return;
   if (typeof data.viewerCount === 'number') {
     updateViewerCountDisplay(data.viewerCount);
   }
-  if (data.isConnected) {
-    updateTikTokBadge('connected', `Đang Live: @${data.username}`);
-    if (statTiktokStatus) statTiktokStatus.innerText = `@${data.username}`;
+
+  const isConnected = data.isConnected === true || data.status === 'connected';
+  const isConnecting = data.isConnecting === true || data.status === 'connecting' || data.status === 'reconnecting';
+
+  if (isConnected) {
+    const channelName = data.username ? `@${data.username}` : '';
+    const roomStr = data.roomId ? ` (Phòng: ${data.roomId})` : '';
+    updateTikTokBadge('connected', `Đang Live: ${channelName}${roomStr}`);
+    if (statTiktokStatus) statTiktokStatus.innerText = channelName || 'Đã kết nối';
     btnConnectTikTok.disabled = true;
     btnDisconnectTikTok.disabled = false;
-  } else if (data.isConnecting) {
-    updateTikTokBadge('connecting', 'Đang kết nối...');
+  } else if (isConnecting) {
+    updateTikTokBadge('connecting', data.message || 'Đang kết nối...');
     if (statTiktokStatus) statTiktokStatus.innerText = 'Đang kết nối...';
     btnConnectTikTok.disabled = true;
     btnDisconnectTikTok.disabled = false;
